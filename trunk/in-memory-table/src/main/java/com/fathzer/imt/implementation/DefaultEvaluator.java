@@ -1,6 +1,6 @@
 package com.fathzer.imt.implementation;
 
-import com.fathzer.imt.Table;
+import com.fathzer.imt.TagsTable;
 import com.fathzer.imt.TableFactory;
 import com.fathzer.soft.javaluator.BracketPair;
 import com.fathzer.soft.javaluator.Operator;
@@ -25,7 +25,7 @@ public class DefaultEvaluator<T, V> extends AbstractLogicalEvaluator<T,V> {
     PARAMETERS.addExpressionBracket(BracketPair.PARENTHESES);
 	}
 
-	public DefaultEvaluator(Table<T, V> table, TableFactory<T, V> factory) {
+	public DefaultEvaluator(TagsTable<T, V> table, TableFactory<T, V> factory) {
 		super(PARAMETERS, table, factory);
 	}
 

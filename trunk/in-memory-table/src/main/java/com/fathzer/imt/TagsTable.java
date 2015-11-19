@@ -18,7 +18,7 @@ import com.fathzer.soft.javaluator.AbstractEvaluator;
  * @param <T> The type of tags. This class should implements hashcode and equals in order to be used in a Map.
  * @param <V> The type of the RecordSet managed by this table.
  */
-public class Table<T, V> implements Cloneable {
+public class TagsTable<T, V> implements Cloneable {
 	private int size;
 	private TableFactory<T, V> factory;
 	private BitmapMap<T,V> tagToBitmap;
@@ -28,13 +28,13 @@ public class Table<T, V> implements Cloneable {
 	/** Creates a new empty table.
 	 * @param adapter A RecordSetAdapter.
 	 */
-	public Table(final TableFactory<T,V> factory) {
+	public TagsTable(final TableFactory<T,V> factory) {
 		this.factory = factory;
 		this.adapter = factory.buildBitmapAdapter();
 		this.evaluator = new ThreadLocal<AbstractEvaluator<V>>() {
 			@Override
 			protected AbstractEvaluator<V> initialValue() {
-				return factory.buildEvaluator(Table.this);
+				return factory.buildEvaluator(TagsTable.this);
 			}
 		};
 		this.tagToBitmap = factory.buildmap();
@@ -114,7 +114,7 @@ public class Table<T, V> implements Cloneable {
 	@Override
 	public Object clone() {
 		@SuppressWarnings("unchecked")
-		Table<T, V> result = (Table<T, V>) this.clone();
+		TagsTable<T, V> result = (TagsTable<T, V>) this.clone();
 		result.tagToBitmap = factory.buildmap();
 		for (T key : this.tagToBitmap.keySet()) {
 			V freshBitmap = adapter.create(adapter.getIterator(getBitMapIndex(key)));
@@ -130,7 +130,7 @@ public class Table<T, V> implements Cloneable {
 	/** Gets an immutable copy of a table.
 	 * @return a new table. This method guarantees no side effect between this and the returned table
 	 */
-	public Table<T,V> getLocked() {
+	public TagsTable<T,V> getLocked() {
 		//FIXME
 		return this; //TODO
 	}

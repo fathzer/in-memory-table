@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import com.fathzer.imt.BitmapMap;
 import com.fathzer.imt.BitmapAdapter;
-import com.fathzer.imt.Table;
+import com.fathzer.imt.TagsTable;
 import com.fathzer.imt.TableFactory;
 import com.fathzer.soft.javaluator.AbstractEvaluator;
 
@@ -24,7 +24,7 @@ public class SimpleTableFactory<V> implements TableFactory<String, V> {
 	}
 
 	@Override
-	public AbstractEvaluator<V> buildEvaluator(Table<String, V> table) {
+	public AbstractEvaluator<V> buildEvaluator(TagsTable<String, V> table) {
 		return new DefaultEvaluator<String, V>(table, this);
 	}
 
