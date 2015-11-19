@@ -6,9 +6,9 @@ import com.fathzer.imt.util.IntIterator;
 
 public class RecordSet<T,V> {
 	private V bitmap;
-	private Table<T, V> table;
+	private TagsTable<T, V> table;
 
-	RecordSet(V bitmap, Table<T,V> table) {
+	RecordSet(V bitmap, TagsTable<T,V> table) {
 		this.bitmap = bitmap;
 		this.table = table;
 	}

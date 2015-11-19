@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-import com.fathzer.imt.Table;
+import com.fathzer.imt.TagsTable;
 import com.fathzer.imt.implementation.SimpleTableFactory;
 import com.fathzer.imt.util.IntIterator;
 import com.fathzer.imt.BitmapAdapter;
@@ -21,11 +21,11 @@ public class TableTest {
 		doTest (getTable(BitmapAdapter.EWAH32));
 	}
 	
-	private <T> Table<String, T> getTable(BitmapAdapter<T> adapter) {
-		return new Table<String, T>(new SimpleTableFactory<T>(adapter));
+	private <T> TagsTable<String, T> getTable(BitmapAdapter<T> adapter) {
+		return new TagsTable<String, T>(new SimpleTableFactory<T>(adapter));
 	}
 
-	private <T> void doTest(Table<String, T> table) {
+	private <T> void doTest(TagsTable<String, T> table) {
 		table.addRecord(new Record("A/C/E"), false);
 		table.addRecord(new Record("B/D/F"), false);
 		RecordSet<String, T> recordSet = table.evaluate("A && C");
@@ -58,7 +58,7 @@ public class TableTest {
 	}
 	
 	private <T> void doAddUnknown(BitmapAdapter<T> adapter) {
-		Table<String, T> table = new Table<String, T>(new SimpleTableFactory<T>(adapter));
+		TagsTable<String, T> table = new TagsTable<String, T>(new SimpleTableFactory<T>(adapter));
 		table.addRecord(new Record("A/C/E"), true);
 	}
 	
@@ -68,7 +68,7 @@ public class TableTest {
 	}
 	
 	private <T> void doEvaluateUnknown(BitmapAdapter<T> adapter) {
-		Table<String, T> table = new Table<String, T>(new SimpleTableFactory<T>(adapter));
+		TagsTable<String, T> table = new TagsTable<String, T>(new SimpleTableFactory<T>(adapter));
 		table.evaluate("A");
 	}
 	
@@ -78,7 +78,7 @@ public class TableTest {
 	}
 	
 	private <T> void doDuplicated(BitmapAdapter<T> adapter) {
-		Table<String, T> table = new Table<String, T>(new SimpleTableFactory<T>(adapter));
+		TagsTable<String, T> table = new TagsTable<String, T>(new SimpleTableFactory<T>(adapter));
 		table.addTags(Arrays.asList(new String[]{"A","A"}), null);
 	}
 }

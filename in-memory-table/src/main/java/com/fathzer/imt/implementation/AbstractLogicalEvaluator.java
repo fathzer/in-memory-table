@@ -3,7 +3,7 @@ package com.fathzer.imt.implementation;
 import java.util.Iterator;
 
 import com.fathzer.imt.BitmapAdapter;
-import com.fathzer.imt.Table;
+import com.fathzer.imt.TagsTable;
 import com.fathzer.imt.TableFactory;
 import com.fathzer.imt.UnknownTagException;
 import com.fathzer.soft.javaluator.AbstractEvaluator;
@@ -11,11 +11,11 @@ import com.fathzer.soft.javaluator.Operator;
 import com.fathzer.soft.javaluator.Parameters;
 
 public abstract class AbstractLogicalEvaluator<T, V> extends AbstractEvaluator<V> {
-  private final Table<T, V> table;
+  private final TagsTable<T, V> table;
 	private TableFactory<T, V> factory;
 	private BitmapAdapter<V> adapter;
 
-	public AbstractLogicalEvaluator(Parameters params, Table<T, V> table, TableFactory<T, V> factory) {
+	public AbstractLogicalEvaluator(Parameters params, TagsTable<T, V> table, TableFactory<T, V> factory) {
 		super(params);
 		this.table = table;
 		this.factory = factory;
