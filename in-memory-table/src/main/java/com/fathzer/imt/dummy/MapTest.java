@@ -59,7 +59,7 @@ public abstract class MapTest<T> {
 
 	
 	public static void main(String[] args) throws IOException {
-		new RoaringTest().doTest();
+		new IntegerTest().doTest();
 	}
 
 	private Class<T> type;

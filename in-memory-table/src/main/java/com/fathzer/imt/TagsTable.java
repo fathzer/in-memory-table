@@ -24,6 +24,7 @@ public class TagsTable<T, V> implements Cloneable {
 	private BitmapMap<T,V> tagToBitmap;
 	private ThreadLocal<AbstractEvaluator<V>> evaluator;
 	private BitmapAdapter<V> adapter;
+	private boolean isLocked;
 	
 	/** Creates a new empty table.
 	 * @param adapter A RecordSetAdapter.
@@ -38,6 +39,7 @@ public class TagsTable<T, V> implements Cloneable {
 			}
 		};
 		this.tagToBitmap = factory.buildmap();
+		this.isLocked = false;
 	}
 	
 	/** Adds some tags to this table.
@@ -46,8 +48,12 @@ public class TagsTable<T, V> implements Cloneable {
 	 * @param recordTags Each element of this list contains the existing record indexes where tag should be added, or null to not attached created tags to any records.
 	 * @throws DuplicatedTagException if a tag is already declared in the table
 	 * @throws IllegalArgumentException if a tagRecords is not null and has not same size as tags.
+	 * @throws IllegalStateException if this is locked
 	 */
 	public void addTags(List<T> tags, List<IntIterator> tagRecords) {
+		if (isLocked()) {
+			throw new IllegalStateException();
+		}
 		if (tagRecords!=null && tags.size()!=tagRecords.size()) {
 			throw new IllegalArgumentException();
 		}
@@ -64,8 +70,12 @@ public class TagsTable<T, V> implements Cloneable {
 	 * @param record an iterator on the tags contained in a record
 	 * @param failIfUnknown true if the method should fail if a tag is unknown, false if unknown tags should be added automatically.
 	 * @throws UnknownTagException if a tag is unknown and <i>failIfUnknown</i> is true.
+	 * @throws IllegalStateException if this is locked
 	 */
 	public void addRecord(Iterator<T> record, boolean failIfUnknown) {
+		if (isLocked()) {
+			throw new IllegalStateException();
+		}
 		while (record.hasNext()) {
 			T tag = record.next();
 			V bitmap = tagToBitmap.get(tag);
@@ -101,7 +111,6 @@ public class TagsTable<T, V> implements Cloneable {
 	/** Gets the set of records having a tag.
 	 * @param tag The tag
 	 * @return a record set. <b>Warning:</b> There are side effects between the returned instance and the table, do not modify the record set !!!
-	 * <br>//TODO It would probably be better to have a mechanism to lock the table and make its recordSet immutable.
 	 */
 	public V getBitMapIndex(T tag) {
 		return this.tagToBitmap.get(tag);
@@ -120,6 +129,7 @@ public class TagsTable<T, V> implements Cloneable {
 			V freshBitmap = adapter.create(adapter.getIterator(getBitMapIndex(key)));
 			result.tagToBitmap.put(key, freshBitmap);
 		}
+		this.isLocked = false;
 		return result;
 	}
 	
@@ -129,13 +139,19 @@ public class TagsTable<T, V> implements Cloneable {
 	
 	/** Gets an immutable copy of a table.
 	 * @return a new table. This method guarantees no side effect between this and the returned table
+	 * <br>//TODO Make table's bitmaps immutable.
 	 */
 	public TagsTable<T,V> getLocked() {
-		//FIXME
-		return this; //TODO
+		@SuppressWarnings("unchecked")
+		TagsTable<T, V> result = (TagsTable<T, V>) clone();
+		result.isLocked = true;
+		return result;
 	}
 	
+	/** Tests whether this table is immutable.
+	 * @return true if the table is immutable.
+	 */
 	public boolean isLocked() {
-		return false; //TODO
+		return isLocked;
 	}
 }
