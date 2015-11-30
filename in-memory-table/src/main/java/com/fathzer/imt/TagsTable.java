@@ -109,7 +109,8 @@ public class TagsTable<T, V extends Bitmap> implements Cloneable {
 	 * @return a record set
 	 */
 	public RecordSet<T,V> evaluate(String logicalExpr) {
-		return new RecordSet<T,V>(evaluator.get().evaluate(logicalExpr), this);
+		V bitmap = evaluator.get().evaluate(logicalExpr);
+		return new RecordSet<T,V>((V) bitmap.getLocked(), this);
 	}
 	
 	/** Gets the set of records having a tag.

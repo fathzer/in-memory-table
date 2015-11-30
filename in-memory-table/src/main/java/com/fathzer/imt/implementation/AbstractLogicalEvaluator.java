@@ -31,18 +31,16 @@ public abstract class AbstractLogicalEvaluator<T, V extends Bitmap> extends Abst
 
 	@Override
 	protected V evaluate(Operator operator, Iterator<V> operands, Object evaluationContext) {
-		@SuppressWarnings("unchecked")
-		V result = (V) operands.next().clone();
+		V result = operands.next();
 		if (getNegate().equals(operator)) {
-			result.not(table.getSize());
+			return (V) result.not(table.getSize());
 		} else if (getOr().equals(operator)) {
-			result.or(operands.next());
+			return (V) result.or(operands.next());
 		} else if (getAnd().equals(operator)) {
-			result.and(operands.next());
+			return (V) result.and(operands.next());
 		} else {
 			return super.evaluate(operator, operands, evaluationContext);
 		}
-		return result;
 	}
 
 	protected abstract Operator getNegate();

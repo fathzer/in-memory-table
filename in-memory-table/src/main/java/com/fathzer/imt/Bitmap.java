@@ -6,22 +6,22 @@ public interface Bitmap extends Cloneable {
 	/** Gets the cardinality of this bitmap.
 	 * @return a positive or null integer
 	 */
-	int getCardinality ();
+	int getCardinality();
 	
 	/** Makes the union of this bitmap with another one.
 	 * @param bitmap second bitmap
 	 */
-	void or(Bitmap bitmap);
+	Bitmap or(Bitmap bitmap);
 		
 	/** Makes the intersection of this bitmap with another one.
 	 * @param bitmap second bitmap
 	 */
-	void and(Bitmap bitmap);
+	Bitmap and(Bitmap bitmap);
 	
 	/** Negates this bitmap.
 	 * @param size The length of the bitmap (bits after this length will not be set)
 	 */
-	void not(int size);
+	Bitmap not(int size);
 	
 	/**  Recovers allocated but unused memory
 	 */
