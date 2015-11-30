@@ -2,24 +2,22 @@ package com.fathzer.imt.implementation;
 
 import java.util.Iterator;
 
-import com.fathzer.imt.BitmapAdapter;
+import com.fathzer.imt.Bitmap;
 import com.fathzer.imt.TagsTable;
-import com.fathzer.imt.TableFactory;
+import com.fathzer.imt.TagsTableFactory;
 import com.fathzer.imt.UnknownTagException;
 import com.fathzer.soft.javaluator.AbstractEvaluator;
 import com.fathzer.soft.javaluator.Operator;
 import com.fathzer.soft.javaluator.Parameters;
 
-public abstract class AbstractLogicalEvaluator<T, V> extends AbstractEvaluator<V> {
-  private final TagsTable<T, V> table;
-	private TableFactory<T, V> factory;
-	private BitmapAdapter<V> adapter;
+public abstract class AbstractLogicalEvaluator<T, V extends Bitmap> extends AbstractEvaluator<V> {
+	private final TagsTable<T, V> table;
+	private TagsTableFactory<T, V> factory;
 
-	public AbstractLogicalEvaluator(Parameters params, TagsTable<T, V> table, TableFactory<T, V> factory) {
+	public AbstractLogicalEvaluator(Parameters params, TagsTable<T, V> table, TagsTableFactory<T, V> factory) {
 		super(params);
 		this.table = table;
 		this.factory = factory;
-		adapter = factory.buildBitmapAdapter();
 	}
 	
 	@Override
@@ -32,18 +30,20 @@ public abstract class AbstractLogicalEvaluator<T, V> extends AbstractEvaluator<V
 	}
 
 	@Override
-  protected V evaluate(Operator operator, Iterator<V> operands, Object evaluationContext) {
-		V ope1 = operands.next();
+	protected V evaluate(Operator operator, Iterator<V> operands, Object evaluationContext) {
+		@SuppressWarnings("unchecked")
+		V result = (V) operands.next().clone();
 		if (getNegate().equals(operator)) {
-      return adapter.not(ope1, table.getSize());
-    } else if (getOr().equals(operator)) {
-      return adapter.or(ope1, operands.next());
-    } else if (getAnd().equals(operator)) {
-      return adapter.and(ope1, operands.next());
-    } else {
-      return super.evaluate(operator, operands, evaluationContext);
-    }
-  }
+			result.not(table.getSize());
+		} else if (getOr().equals(operator)) {
+			result.or(operands.next());
+		} else if (getAnd().equals(operator)) {
+			result.and(operands.next());
+		} else {
+			return super.evaluate(operator, operands, evaluationContext);
+		}
+		return result;
+	}
 
 	protected abstract Operator getNegate();
 	protected abstract Operator getAnd();

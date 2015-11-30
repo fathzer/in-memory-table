@@ -7,25 +7,22 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import com.fathzer.imt.TagsTable;
-import com.fathzer.imt.implementation.SimpleTableFactory;
+import com.fathzer.imt.implementation.BitSetBitmap;
+import com.fathzer.imt.implementation.RoaringBitmap;
+import com.fathzer.imt.implementation.SimpleTagsTableFactory;
 import com.fathzer.imt.util.IntIterator;
-import com.fathzer.imt.BitmapAdapter;
 
 public class TableTest {
 
 	@Test
 	public void test() {
-		doTest (getTable(BitmapAdapter.ROARING));
-		doTest (getTable(BitmapAdapter.BITSET));
-		doTest (getTable(BitmapAdapter.EWAH64));
-		doTest (getTable(BitmapAdapter.EWAH32));
+		doTest (new TagsTable<String, RoaringBitmap>(SimpleTagsTableFactory.ROARING_FACTORY));
+		doTest (new TagsTable<String, BitSetBitmap>(SimpleTagsTableFactory.BITSET_FACTORY));
+//		return new TagsTable<String, T>(new SimpleTableFactory<T>(BitmapAdapter.EWAH64));
 	}
 	
-	private <T> TagsTable<String, T> getTable(BitmapAdapter<T> adapter) {
-		return new TagsTable<String, T>(new SimpleTableFactory<T>(adapter));
-	}
 
-	private <T> void doTest(TagsTable<String, T> table) {
+	private <T extends Bitmap> void doTest(TagsTable<String, T> table) {
 		table.addRecord(new Record("A/C/E"), false);
 		table.addRecord(new Record("B/D/F"), false);
 		RecordSet<String, T> recordSet = table.evaluate("A && C");
@@ -54,31 +51,31 @@ public class TableTest {
 	
 	@Test(expected = UnknownTagException.class)
 	public void doAddUnknown() {
-		doAddUnknown(BitmapAdapter.BITSET);
+		doAddUnknown(SimpleTagsTableFactory.BITSET_FACTORY);
 	}
 	
-	private <T> void doAddUnknown(BitmapAdapter<T> adapter) {
-		TagsTable<String, T> table = new TagsTable<String, T>(new SimpleTableFactory<T>(adapter));
+	private <T extends Bitmap> void doAddUnknown(SimpleTagsTableFactory<T> factory) {
+		TagsTable<String, T> table = new TagsTable<String, T>(factory);
 		table.addRecord(new Record("A/C/E"), true);
 	}
 	
 	@Test(expected = UnknownTagException.class)
 	public void doEvaluateUnknown() {
-		doEvaluateUnknown(BitmapAdapter.BITSET);
+		doEvaluateUnknown(SimpleTagsTableFactory.BITSET_FACTORY);
 	}
 	
-	private <T> void doEvaluateUnknown(BitmapAdapter<T> adapter) {
-		TagsTable<String, T> table = new TagsTable<String, T>(new SimpleTableFactory<T>(adapter));
+	private <T extends Bitmap> void doEvaluateUnknown(SimpleTagsTableFactory<T> factory) {
+		TagsTable<String, T> table = new TagsTable<String, T>(factory);
 		table.evaluate("A");
 	}
 	
 	@Test(expected = DuplicatedTagException.class)
 	public void doDuplicated() {
-		doDuplicated(BitmapAdapter.BITSET);
+		doDuplicated(SimpleTagsTableFactory.BITSET_FACTORY);
 	}
 	
-	private <T> void doDuplicated(BitmapAdapter<T> adapter) {
-		TagsTable<String, T> table = new TagsTable<String, T>(new SimpleTableFactory<T>(adapter));
+	private <T extends Bitmap> void doDuplicated(SimpleTagsTableFactory<T> factory) {
+		TagsTable<String, T> table = new TagsTable<String, T>(factory);
 		table.addTags(Arrays.asList(new String[]{"A","A"}), null);
 	}
 }

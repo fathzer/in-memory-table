@@ -18,20 +18,18 @@ import com.fathzer.soft.javaluator.AbstractEvaluator;
  * @param <T> The type of tags. This class should implements hashcode and equals in order to be used in a Map.
  * @param <V> The type of the RecordSet managed by this table.
  */
-public class TagsTable<T, V> implements Cloneable {
+public class TagsTable<T, V extends Bitmap> implements Cloneable {
 	private int size;
-	private TableFactory<T, V> factory;
+	private TagsTableFactory<T, V> factory;
 	private BitmapMap<T,V> tagToBitmap;
 	private ThreadLocal<AbstractEvaluator<V>> evaluator;
-	private BitmapAdapter<V> adapter;
 	private boolean isLocked;
 	
 	/** Creates a new empty table.
 	 * @param adapter A RecordSetAdapter.
 	 */
-	public TagsTable(final TableFactory<T,V> factory) {
+	public TagsTable(final TagsTableFactory<T,V> factory) {
 		this.factory = factory;
-		this.adapter = factory.buildBitmapAdapter();
 		this.evaluator = new ThreadLocal<AbstractEvaluator<V>>() {
 			@Override
 			protected AbstractEvaluator<V> initialValue() {
@@ -62,7 +60,13 @@ public class TagsTable<T, V> implements Cloneable {
 			if (tagToBitmap.containsKey(tag)) {
 				throw new DuplicatedTagException(tag.toString());
 			}
-			tagToBitmap.put(tag, tagRecords==null?this.adapter.create():this.adapter.create(tagRecords.get(i)));
+			V bitmap = this.factory.create();
+			if (tagRecords!=null) {
+				while (tagRecords.get(i).hasNext()) {
+					bitmap.add(tagRecords.get(i).next());
+				}
+			}
+			tagToBitmap.put(tag, bitmap);
 		}
 	}
 	
@@ -83,11 +87,11 @@ public class TagsTable<T, V> implements Cloneable {
 				if (failIfUnknown) {
 					throw new UnknownTagException(tag.toString());
 				} else {
-					bitmap = this.adapter.create();
+					bitmap = this.factory.create();
 					tagToBitmap.put(tag, bitmap);
 				}
 			}
-			this.adapter.add(bitmap, size);
+			bitmap.add(size);
 		}
 		size++;
 	}
@@ -126,26 +130,32 @@ public class TagsTable<T, V> implements Cloneable {
 		TagsTable<T, V> result = (TagsTable<T, V>) this.clone();
 		result.tagToBitmap = factory.buildmap();
 		for (T key : this.tagToBitmap.keySet()) {
-			V freshBitmap = adapter.create(adapter.getIterator(getBitMapIndex(key)));
+			IntIterator iterator = getBitMapIndex(key).getIterator();
+			V freshBitmap = factory.create();
+			while (iterator.hasNext()) {
+				freshBitmap.add(iterator.next());
+			}
+			freshBitmap.trim();
 			result.tagToBitmap.put(key, freshBitmap);
 		}
 		this.isLocked = false;
 		return result;
 	}
 	
-	BitmapAdapter<V> getAdapter() {
-		return adapter;
-	}
-	
 	/** Gets an immutable copy of a table.
-	 * @return a new table. This method guarantees no side effect between this and the returned table
-	 * <br>//TODO Make table's bitmaps immutable.
+	 * @return a new table. This method guarantees no side effect between this and the returned table.
 	 */
 	public TagsTable<T,V> getLocked() {
-		@SuppressWarnings("unchecked")
-		TagsTable<T, V> result = (TagsTable<T, V>) clone();
-		result.isLocked = true;
-		return result;
+		if (isLocked) {
+			return this;
+		} else {
+			@SuppressWarnings("unchecked")
+			TagsTable<T, V> result = (TagsTable<T, V>) clone();
+			result.tagToBitmap = factory.buildmap();
+			//FIXME copy map
+			result.isLocked = true;
+			return result;
+		}
 	}
 	
 	/** Tests whether this table is immutable.
