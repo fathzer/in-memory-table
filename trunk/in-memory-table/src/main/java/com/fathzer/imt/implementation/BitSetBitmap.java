@@ -10,7 +10,11 @@ public class BitSetBitmap implements Bitmap, Cloneable {
 	private boolean isLocked;
 	
 	public BitSetBitmap() {
-		this.set = new BitSet();
+		this (new BitSet());
+	}
+
+	private BitSetBitmap(BitSet set) {
+		this.set = set;
 		this.isLocked = false;
 	}
 
@@ -19,21 +23,24 @@ public class BitSetBitmap implements Bitmap, Cloneable {
 		return set.cardinality();
 	}
 	@Override
-	public void or(Bitmap bitmap) {
-		check();
-		set.or(((BitSetBitmap)bitmap).set);
+	public BitSetBitmap or(Bitmap bitmap) {
+		BitSet result = (BitSet) set.clone();
+		result.or(((BitSetBitmap)bitmap).set);
+		return new BitSetBitmap(result);
 	}
 
 	@Override
-	public void and(Bitmap bitmap) {
-		check();
-		set.and(((BitSetBitmap)bitmap).set);
+	public BitSetBitmap and(Bitmap bitmap) {
+		BitSet result = (BitSet) set.clone();
+		result.and(((BitSetBitmap)bitmap).set);
+		return new BitSetBitmap(result);
 	}
 
 	@Override
-	public void not(int size) {
-		check();
-	    set.flip(0, size);
+	public BitSetBitmap not(int size) {
+		BitSet result = (BitSet) set.clone();
+		result.flip(0, size);
+		return new BitSetBitmap(result);
 	}
 
 	@Override

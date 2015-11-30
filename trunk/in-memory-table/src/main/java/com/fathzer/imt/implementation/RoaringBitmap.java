@@ -8,7 +8,11 @@ public class RoaringBitmap implements Bitmap, Cloneable {
 	private boolean isLocked;
 	
 	public RoaringBitmap() {
-		set = new org.roaringbitmap.RoaringBitmap();
+		this(new org.roaringbitmap.RoaringBitmap());
+	}
+	
+	private RoaringBitmap(org.roaringbitmap.RoaringBitmap set) {
+		this.set = set;
 		this.isLocked = false;
 	}
 
@@ -17,21 +21,21 @@ public class RoaringBitmap implements Bitmap, Cloneable {
 		return set.getCardinality();
 	}
 	@Override
-	public void or(Bitmap bitmap) {
-		check();
-		set.or(((RoaringBitmap)bitmap).set);
+	public Bitmap or(Bitmap bitmap) {
+//		check();
+		return new RoaringBitmap(org.roaringbitmap.RoaringBitmap.or(this.set, ((RoaringBitmap)bitmap).set));
 	}
 
 	@Override
-	public void and(Bitmap bitmap) {
-		check();
-		set.and(((RoaringBitmap)bitmap).set);
+	public Bitmap and(Bitmap bitmap) {
+//		check();
+		return new RoaringBitmap(org.roaringbitmap.RoaringBitmap.and(this.set, ((RoaringBitmap)bitmap).set));
 	}
 
 	@Override
-	public void not(int size) {
-		check();
-	    set.flip(0, size);
+	public Bitmap not(int size) {
+//		check();
+		return new RoaringBitmap(org.roaringbitmap.RoaringBitmap.flip(this.set, 0, size));
 	}
 
 	@Override
@@ -89,8 +93,9 @@ public class RoaringBitmap implements Bitmap, Cloneable {
 			return this;
 		} else {
 			RoaringBitmap result = (RoaringBitmap) clone();
-			result.isLocked = true;
 			result.set = set.clone();
+			result.set.trim();
+			result.isLocked = true;
 			return result;
 		}
 	}
