@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 import com.fathzer.imt.util.IntIterator;
 
-public class RecordSet<T,V> {
+public class RecordSet<T,V extends Bitmap> {
 	private V bitmap;
 	private TagsTable<T, V> table;
 
@@ -17,14 +17,14 @@ public class RecordSet<T,V> {
 	 * @return a positive integer.
 	 */
 	public int size() {
-		return table.getAdapter().getCardinality(bitmap);
+		return bitmap.getCardinality();
 	}
 	
 	/** Gets the ids of records.
 	 * @return an iterator
 	 */
 	public IntIterator getIds() {
-		return table.getAdapter().getIterator(bitmap);
+		return bitmap.getIterator();
 	}
 	
 	/** Gets the tags of a record.

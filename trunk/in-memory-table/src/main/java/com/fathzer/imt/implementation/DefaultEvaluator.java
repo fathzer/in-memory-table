@@ -1,12 +1,13 @@
 package com.fathzer.imt.implementation;
 
+import com.fathzer.imt.Bitmap;
 import com.fathzer.imt.TagsTable;
-import com.fathzer.imt.TableFactory;
+import com.fathzer.imt.TagsTableFactory;
 import com.fathzer.soft.javaluator.BracketPair;
 import com.fathzer.soft.javaluator.Operator;
 import com.fathzer.soft.javaluator.Parameters;
 
-public class DefaultEvaluator<T, V> extends AbstractLogicalEvaluator<T,V> {
+public class DefaultEvaluator<T, V extends Bitmap> extends AbstractLogicalEvaluator<T,V> {
 	/** The negate unary operator.*/
   private final static Operator NEGATE = new Operator("!", 1, Operator.Associativity.RIGHT, 3);
   /** The logical AND operator.*/
@@ -25,7 +26,7 @@ public class DefaultEvaluator<T, V> extends AbstractLogicalEvaluator<T,V> {
     PARAMETERS.addExpressionBracket(BracketPair.PARENTHESES);
 	}
 
-	public DefaultEvaluator(TagsTable<T, V> table, TableFactory<T, V> factory) {
+	public DefaultEvaluator(TagsTable<T, V> table, TagsTableFactory<T, V> factory) {
 		super(PARAMETERS, table, factory);
 	}
 
