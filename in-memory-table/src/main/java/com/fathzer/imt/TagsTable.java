@@ -2,6 +2,7 @@ package com.fathzer.imt;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import com.fathzer.imt.util.IntIterator;
 import com.fathzer.soft.javaluator.AbstractEvaluator;
@@ -127,20 +128,24 @@ public class TagsTable<T, V extends Bitmap> implements Cloneable {
 	 */
 	@Override
 	public Object clone() {
-		@SuppressWarnings("unchecked")
-		TagsTable<T, V> result = (TagsTable<T, V>) this.clone();
-		result.tagToBitmap = factory.buildmap();
-		for (T key : this.tagToBitmap.keySet()) {
-			IntIterator iterator = getBitMapIndex(key).getIterator();
-			V freshBitmap = factory.create();
-			while (iterator.hasNext()) {
-				freshBitmap.add(iterator.next());
+		try {
+			@SuppressWarnings("unchecked")
+			TagsTable<T, V> result = (TagsTable<T, V>) super.clone();
+			result.tagToBitmap = factory.buildmap();
+			for (T key : this.tagToBitmap.keySet()) {
+				IntIterator iterator = getBitMapIndex(key).getIterator();
+				V freshBitmap = factory.create();
+				while (iterator.hasNext()) {
+					freshBitmap.add(iterator.next());
+				}
+				freshBitmap.trim();
+				result.tagToBitmap.put(key, freshBitmap);
 			}
-			freshBitmap.trim();
-			result.tagToBitmap.put(key, freshBitmap);
+			this.isLocked = false;
+			return result;
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
 		}
-		this.isLocked = false;
-		return result;
 	}
 	
 	/** Gets an immutable copy of a table.
@@ -153,7 +158,10 @@ public class TagsTable<T, V extends Bitmap> implements Cloneable {
 			@SuppressWarnings("unchecked")
 			TagsTable<T, V> result = (TagsTable<T, V>) clone();
 			result.tagToBitmap = factory.buildmap();
-			//FIXME copy map
+			Set<T> keys = tagToBitmap.keySet();
+			for (T key : keys) {
+				result.tagToBitmap.put(key, (V) tagToBitmap.get(key).getLocked());
+			}
 			result.isLocked = true;
 			return result;
 		}
