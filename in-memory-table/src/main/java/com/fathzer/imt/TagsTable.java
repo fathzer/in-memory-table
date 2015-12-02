@@ -20,9 +20,11 @@ import com.fathzer.soft.javaluator.AbstractEvaluator;
  * @param <V> The type of the RecordSet managed by this table.
  */
 public class TagsTable<T, V extends Bitmap> implements Cloneable {
+	//TODO Remove V
 	private int size;
+	private int logicalSize;
 	private TagsTableFactory<T, V> factory;
-	private V deletedRecords;
+	private Bitmap deletedRecords;
 	private BitmapMap<T,V> tagToBitmap;
 	private ThreadLocal<AbstractEvaluator<V>> evaluator;
 	private boolean isLocked;
@@ -41,6 +43,8 @@ public class TagsTable<T, V extends Bitmap> implements Cloneable {
 		};
 		this.tagToBitmap = factory.buildmap();
 		this.isLocked = false;
+		this.logicalSize = 0;
+		this.size = 0;
 	}
 	
 	/** Adds some tags to this table.
@@ -94,6 +98,7 @@ public class TagsTable<T, V extends Bitmap> implements Cloneable {
 			}
 			bitmap.add(size);
 		}
+		logicalSize++;
 		return size++;
 	}
 
@@ -112,10 +117,12 @@ public class TagsTable<T, V extends Bitmap> implements Cloneable {
 		if (index>=size || index<0) {
 			throw new IllegalArgumentException();
 		}
+		//TODO Ruser dans le cas où on supprime le dernier index (size peut être diminué et deletedRecords n'est pas modifié.
 		deletedRecords.add(index);
 		for (V bitmap:tagToBitmap.values()) {
 			bitmap.remove(index);
 		}
+		logicalSize--;
 	}
 	
 	/** Gets the number of records contained in the table, including deleted records.
@@ -175,6 +182,7 @@ public class TagsTable<T, V extends Bitmap> implements Cloneable {
 				freshBitmap.trim();
 				result.tagToBitmap.put(key, freshBitmap);
 			}
+			result.deletedRecords = (V) deletedRecords.clone();
 			this.isLocked = false;
 			return result;
 		} catch (CloneNotSupportedException e) {
@@ -196,6 +204,7 @@ public class TagsTable<T, V extends Bitmap> implements Cloneable {
 			for (T key : keys) {
 				result.tagToBitmap.put(key, (V) tagToBitmap.get(key).getLocked());
 			}
+			result.deletedRecords = (V) deletedRecords.clone();
 			result.isLocked = true;
 			return result;
 		}
