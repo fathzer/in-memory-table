@@ -22,6 +22,7 @@ import com.fathzer.soft.javaluator.AbstractEvaluator;
 public class TagsTable<T, V extends Bitmap> implements Cloneable {
 	private int size;
 	private TagsTableFactory<T, V> factory;
+	private V deletedRecords;
 	private BitmapMap<T,V> tagToBitmap;
 	private ThreadLocal<AbstractEvaluator<V>> evaluator;
 	private boolean isLocked;
@@ -31,6 +32,7 @@ public class TagsTable<T, V extends Bitmap> implements Cloneable {
 	 */
 	public TagsTable(final TagsTableFactory<T,V> factory) {
 		this.factory = factory;
+		this.deletedRecords = factory.create();
 		this.evaluator = new ThreadLocal<AbstractEvaluator<V>>() {
 			@Override
 			protected AbstractEvaluator<V> initialValue() {
@@ -50,9 +52,7 @@ public class TagsTable<T, V extends Bitmap> implements Cloneable {
 	 * @throws IllegalStateException if this is locked
 	 */
 	public void addTags(List<T> tags, List<IntIterator> tagRecords) {
-		if (isLocked()) {
-			throw new IllegalStateException();
-		}
+		check();
 		if (tagRecords!=null && tags.size()!=tagRecords.size()) {
 			throw new IllegalArgumentException();
 		}
@@ -74,13 +74,13 @@ public class TagsTable<T, V extends Bitmap> implements Cloneable {
 	/** Adds a record to the table.
 	 * @param record an iterator on the tags contained in a record
 	 * @param failIfUnknown true if the method should fail if a tag is unknown, false if unknown tags should be added automatically.
+	 * @return the index of the added record in the table.
 	 * @throws UnknownTagException if a tag is unknown and <i>failIfUnknown</i> is true.
 	 * @throws IllegalStateException if this is locked
 	 */
-	public void addRecord(Iterator<T> record, boolean failIfUnknown) {
-		if (isLocked()) {
-			throw new IllegalStateException();
-		}
+	public int addRecord(Iterator<T> record, boolean failIfUnknown) {
+		check();
+		//TODO detect first deleted record and insert new record there
 		while (record.hasNext()) {
 			T tag = record.next();
 			V bitmap = tagToBitmap.get(tag);
@@ -94,14 +94,44 @@ public class TagsTable<T, V extends Bitmap> implements Cloneable {
 			}
 			bitmap.add(size);
 		}
-		size++;
+		return size++;
+	}
+
+	private void check() {
+		if (isLocked()) {
+			throw new IllegalStateException();
+		}
 	}
 	
-	/** Gets the number of records contained in the table.
+	/** Deletes a record.
+	 * @param index The record index (returned by method {@link #addRecord(Iterator, boolean)} or by a iterator on a {@link RecordSet}
+	 * @throws IllegalArgumentException if index is negative or greater than or equals to size.
+	 */
+	public void deleteRecord(int index) {
+		check();
+		if (index>=size || index<0) {
+			throw new IllegalArgumentException();
+		}
+		deletedRecords.add(index);
+		for (V bitmap:tagToBitmap.values()) {
+			bitmap.remove(index);
+		}
+	}
+	
+	/** Gets the number of records contained in the table, including deleted records.
+	 * <br>No record can have an index greater than or equals to @{link #getSize())
 	 * @return an integer
 	 */
 	public int getSize() {
 		return this.size;
+	}
+	
+	/** Gets the number of records contained in the table, excluding deleted records.
+	 * <br>Records can have an index greater than or equals to @{link #getLogicalSize())
+	 * @return an integer
+	 */
+	public int getLogicalSize() {
+		return this.size - deletedRecords.getCardinality();
 	}
 
 	/** Gets the set of records that verify a logical expression.
@@ -111,6 +141,10 @@ public class TagsTable<T, V extends Bitmap> implements Cloneable {
 	 */
 	public RecordSet<T,V> evaluate(String logicalExpr) {
 		V bitmap = evaluator.get().evaluate(logicalExpr);
+		if (bitmap.isLocked()) {
+			bitmap = (V) bitmap.clone();
+		}
+		bitmap.and(deletedRecords);
 		return new RecordSet<T,V>((V) bitmap.getLocked(), this);
 	}
 	
