@@ -23,8 +23,10 @@ public class TableTest {
 	
 
 	private <T extends Bitmap> void doTest(TagsTable<String, T> table) {
-		table.addRecord(new Record("A/C/E"), false);
-		table.addRecord(new Record("B/D/F"), false);
+		int index = table.addRecord(new Record("A/C/E"), false);
+		assertEquals(0, index);
+		
+		assertEquals(1, table.addRecord(new Record("B/D/F"), false));
 		RecordSet<String, T> recordSet = table.evaluate("A && C");
 		IntIterator iterator = recordSet.getIds();
 		assertEquals(0, iterator.next());

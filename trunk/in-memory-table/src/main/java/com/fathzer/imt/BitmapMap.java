@@ -1,5 +1,6 @@
 package com.fathzer.imt;
 
+import java.util.Collection;
 import java.util.Set;
 
 public interface BitmapMap<T,V> {
@@ -7,4 +8,5 @@ public interface BitmapMap<T,V> {
 	V get(T key);
 	V put(T key, V value);
 	Set<T> keySet();
+	Collection<V> values();
 }
