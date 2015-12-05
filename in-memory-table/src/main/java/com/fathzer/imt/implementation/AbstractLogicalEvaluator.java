@@ -4,25 +4,22 @@ import java.util.Iterator;
 
 import com.fathzer.imt.Bitmap;
 import com.fathzer.imt.TagsTable;
-import com.fathzer.imt.TagsTableFactory;
 import com.fathzer.imt.UnknownTagException;
 import com.fathzer.soft.javaluator.AbstractEvaluator;
 import com.fathzer.soft.javaluator.Operator;
 import com.fathzer.soft.javaluator.Parameters;
 
-public abstract class AbstractLogicalEvaluator<T, V extends Bitmap> extends AbstractEvaluator<V> {
-	private final TagsTable<T, V> table;
-	private TagsTableFactory<T, V> factory;
+public abstract class AbstractLogicalEvaluator<T> extends AbstractEvaluator<Bitmap> {
+	private final TagsTable<T> table;
 
-	public AbstractLogicalEvaluator(Parameters params, TagsTable<T, V> table, TagsTableFactory<T, V> factory) {
+	public AbstractLogicalEvaluator(Parameters params, TagsTable<T> table) {
 		super(params);
 		this.table = table;
-		this.factory = factory;
 	}
 	
 	@Override
-	protected V toValue(String literal, Object evaluationContext) {
-		V result = this.table.getBitMapIndex(this.factory.stringToTag(literal));
+	protected Bitmap toValue(String literal, Object evaluationContext) {
+		Bitmap result = this.table.getBitMapIndex(table.getFactory().stringToTag(literal));
 		if (result==null) {
 			throw new UnknownTagException(literal);
 		}
@@ -30,14 +27,14 @@ public abstract class AbstractLogicalEvaluator<T, V extends Bitmap> extends Abst
 	}
 
 	@Override
-	protected V evaluate(Operator operator, Iterator<V> operands, Object evaluationContext) {
-		V result = operands.next();
+	protected Bitmap evaluate(Operator operator, Iterator<Bitmap> operands, Object evaluationContext) {
+		Bitmap result = operands.next();
 		if (getNegate().equals(operator)) {
-			return (V) result.not(table.getSize());
+			return result.not(table.getSize());
 		} else if (getOr().equals(operator)) {
-			return (V) result.or(operands.next());
+			return result.or(operands.next());
 		} else if (getAnd().equals(operator)) {
-			return (V) result.and(operands.next());
+			return result.and(operands.next());
 		} else {
 			return super.evaluate(operator, operands, evaluationContext);
 		}
