@@ -1,9 +1,7 @@
 package com.fathzer.imt;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.collections4.IteratorUtils;
@@ -14,7 +12,6 @@ import static org.junit.Assert.*;
 import com.fathzer.imt.TagsTable;
 import com.fathzer.imt.implementation.SimpleTagsTableFactory;
 import com.fathzer.imt.util.IntIterator;
-import com.googlecode.javaewah.IteratorUtil;
 
 public class TableTest {
 
@@ -22,7 +19,6 @@ public class TableTest {
 	public void test() {
 		doTest (new TagsTable<String>(SimpleTagsTableFactory.ROARING_FACTORY));
 		doTest (new TagsTable<String>(SimpleTagsTableFactory.BITSET_FACTORY));
-//		return new TagsTable<String, T>(new SimpleTableFactory<T>(BitmapAdapter.EWAH64));
 	}
 	
 
