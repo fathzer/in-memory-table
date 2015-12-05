@@ -1,7 +1,5 @@
 package com.fathzer.imt;
 
-import java.util.Iterator;
-
 import com.fathzer.imt.util.IntIterator;
 
 public class RecordSet<T> {
@@ -27,11 +25,10 @@ public class RecordSet<T> {
 		return bitmap.getIterator();
 	}
 	
-	/** Gets the tags of a record.
-	 * @param id The id of the record (as returned by {@link #getIds()} iterator).
-	 * @return a new Iterator
+	/** Gets this record's table.
+	 * @return The table the record set on which the record set was built.
 	 */
-	public Iterator<T> getTags(int id) {
-		return table.getTags(id);
+	public TagsTable<T> getTable() {
+		return table;
 	}
 }
