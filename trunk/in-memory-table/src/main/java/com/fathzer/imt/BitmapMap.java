@@ -3,10 +3,10 @@ package com.fathzer.imt;
 import java.util.Collection;
 import java.util.Set;
 
-public interface BitmapMap<T,V> {
+public interface BitmapMap<T> {
 	boolean containsKey(T key);
-	V get(T key);
-	V put(T key, V value);
+	Bitmap get(T key);
+	Bitmap put(T key, Bitmap value);
 	Set<T> keySet();
-	Collection<V> values();
+	Collection<Bitmap> values();
 }

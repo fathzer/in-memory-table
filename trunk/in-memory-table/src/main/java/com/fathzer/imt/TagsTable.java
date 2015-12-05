@@ -2,7 +2,7 @@ package com.fathzer.imt;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.NoSuchElementException;
 
 import com.fathzer.imt.util.IntIterator;
 import com.fathzer.soft.javaluator.AbstractEvaluator;
@@ -17,27 +17,63 @@ import com.fathzer.soft.javaluator.AbstractEvaluator;
  * <br>
  * @author JM Astesana
  * @param <T> The type of tags. This class should implements hashcode and equals in order to be used in a Map.
- * @param <V> The type of the RecordSet managed by this table.
  */
-public class TagsTable<T, V extends Bitmap> implements Cloneable {
-	//TODO Remove V
+public class TagsTable<T> implements Cloneable {
+	private final class TagsIterator implements Iterator<T> {
+		private T next;
+		private Iterator<T> iter;
+		private int id;
+		
+		public TagsIterator(int id) {
+			this.id = id;
+			iter = tagToBitmap.keySet().iterator();
+			findNext();
+		}
+
+		private void findNext() {
+			next=null;
+			while (next==null && iter.hasNext()) {
+				T key = iter.next();
+				if (tagToBitmap.get(key).contains(id)) {
+					next = key;
+				}
+			}
+		}
+
+		@Override
+		public boolean hasNext() {
+			return next!=null;
+		}
+
+		@Override
+		public T next() {
+			if (next==null) {
+				throw new NoSuchElementException();
+			} else {
+				T result = next;
+				findNext();
+				return result;
+			}
+		}
+	}
+
 	private int size;
 	private int logicalSize;
-	private TagsTableFactory<T, V> factory;
+	private TagsTableFactory<T> factory;
 	private Bitmap deletedRecords;
-	private BitmapMap<T,V> tagToBitmap;
-	private ThreadLocal<AbstractEvaluator<V>> evaluator;
+	private BitmapMap<T> tagToBitmap;
+	private ThreadLocal<AbstractEvaluator<Bitmap>> evaluator;
 	private boolean isLocked;
 	
 	/** Creates a new empty table.
-	 * @param adapter A RecordSetAdapter.
+	 * @param adapter A TagsTableFactory.
 	 */
-	public TagsTable(final TagsTableFactory<T,V> factory) {
+	public TagsTable(final TagsTableFactory<T> factory) {
 		this.factory = factory;
 		this.deletedRecords = factory.create();
-		this.evaluator = new ThreadLocal<AbstractEvaluator<V>>() {
+		this.evaluator = new ThreadLocal<AbstractEvaluator<Bitmap>>() {
 			@Override
-			protected AbstractEvaluator<V> initialValue() {
+			protected AbstractEvaluator<Bitmap> initialValue() {
 				return factory.buildEvaluator(TagsTable.this);
 			}
 		};
@@ -65,7 +101,7 @@ public class TagsTable<T, V extends Bitmap> implements Cloneable {
 			if (tagToBitmap.containsKey(tag)) {
 				throw new DuplicatedTagException(tag.toString());
 			}
-			V bitmap = this.factory.create();
+			Bitmap bitmap = this.factory.create();
 			if (tagRecords!=null) {
 				while (tagRecords.get(i).hasNext()) {
 					bitmap.add(tagRecords.get(i).next());
@@ -87,7 +123,7 @@ public class TagsTable<T, V extends Bitmap> implements Cloneable {
 		//TODO detect first deleted record and insert new record there
 		while (record.hasNext()) {
 			T tag = record.next();
-			V bitmap = tagToBitmap.get(tag);
+			Bitmap bitmap = tagToBitmap.get(tag);
 			if (bitmap==null) {
 				if (failIfUnknown) {
 					throw new UnknownTagException(tag.toString());
@@ -119,7 +155,7 @@ public class TagsTable<T, V extends Bitmap> implements Cloneable {
 		}
 		//TODO Ruser dans le cas où on supprime le dernier index (size peut être diminué et deletedRecords n'est pas modifié.
 		deletedRecords.add(index);
-		for (V bitmap:tagToBitmap.values()) {
+		for (Bitmap bitmap:tagToBitmap.values()) {
 			bitmap.remove(index);
 		}
 		logicalSize--;
@@ -146,20 +182,20 @@ public class TagsTable<T, V extends Bitmap> implements Cloneable {
 	 * <br>Supported operators are ! (not), && (and) and || (or).
 	 * @return a record set
 	 */
-	public RecordSet<T,V> evaluate(String logicalExpr) {
-		V bitmap = evaluator.get().evaluate(logicalExpr);
+	public RecordSet<T> evaluate(String logicalExpr) {
+		Bitmap bitmap = evaluator.get().evaluate(logicalExpr);
 		if (bitmap.isLocked()) {
-			bitmap = (V) bitmap.clone();
+			bitmap = bitmap.clone();
 		}
 		bitmap.and(deletedRecords);
-		return new RecordSet<T,V>((V) bitmap.getLocked(), this);
+		return new RecordSet<T>(bitmap.getLocked(), this);
 	}
 	
 	/** Gets the set of records having a tag.
 	 * @param tag The tag
 	 * @return a record set. <b>Warning:</b> There are side effects between the returned instance and the table, do not modify the record set !!!
 	 */
-	public V getBitMapIndex(T tag) {
+	public Bitmap getBitMapIndex(T tag) {
 		return this.tagToBitmap.get(tag);
 	}
 	
@@ -171,18 +207,18 @@ public class TagsTable<T, V extends Bitmap> implements Cloneable {
 	public Object clone() {
 		try {
 			@SuppressWarnings("unchecked")
-			TagsTable<T, V> result = (TagsTable<T, V>) super.clone();
+			TagsTable<T> result = (TagsTable<T>) super.clone();
 			result.tagToBitmap = factory.buildmap();
 			for (T key : this.tagToBitmap.keySet()) {
 				IntIterator iterator = getBitMapIndex(key).getIterator();
-				V freshBitmap = factory.create();
+				Bitmap freshBitmap = factory.create();
 				while (iterator.hasNext()) {
 					freshBitmap.add(iterator.next());
 				}
 				freshBitmap.trim();
 				result.tagToBitmap.put(key, freshBitmap);
 			}
-			result.deletedRecords = (V) deletedRecords.clone();
+			result.deletedRecords = deletedRecords.clone();
 			this.isLocked = false;
 			return result;
 		} catch (CloneNotSupportedException e) {
@@ -193,18 +229,17 @@ public class TagsTable<T, V extends Bitmap> implements Cloneable {
 	/** Gets an immutable copy of a table.
 	 * @return a new table. This method guarantees no side effect between this and the returned table.
 	 */
-	public TagsTable<T,V> getLocked() {
+	public TagsTable<T> getLocked() {
 		if (isLocked) {
 			return this;
 		} else {
 			@SuppressWarnings("unchecked")
-			TagsTable<T, V> result = (TagsTable<T, V>) clone();
+			TagsTable<T> result = (TagsTable<T>) clone();
 			result.tagToBitmap = factory.buildmap();
-			Set<T> keys = tagToBitmap.keySet();
-			for (T key : keys) {
-				result.tagToBitmap.put(key, (V) tagToBitmap.get(key).getLocked());
+			for (T key : tagToBitmap.keySet()) {
+				result.tagToBitmap.put(key, tagToBitmap.get(key).getLocked());
 			}
-			result.deletedRecords = (V) deletedRecords.clone();
+			result.deletedRecords = deletedRecords.clone();
 			result.isLocked = true;
 			return result;
 		}
@@ -215,5 +250,24 @@ public class TagsTable<T, V extends Bitmap> implements Cloneable {
 	 */
 	public boolean isLocked() {
 		return isLocked;
+	}
+
+	/** Gets the factory used to build this table.
+	 * @return a TagsTableFactory
+	 */
+	public TagsTableFactory<T> getFactory() {
+		return factory;
+	}
+
+	/** Gets the tags associated with an id.
+	 * @param id A record id
+	 * @return an iterator on tags presents in this record.
+	 * @throws IllegalArgumentException if id is greater than or equal to {@link #getSize()}.
+	 */
+	public Iterator<T> getTags(int id) {
+		if (id>=getSize()) {
+			throw new IllegalArgumentException();
+		}
+		return new TagsIterator(id);
 	}
 }

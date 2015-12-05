@@ -4,11 +4,11 @@ import java.util.Iterator;
 
 import com.fathzer.imt.util.IntIterator;
 
-public class RecordSet<T,V extends Bitmap> {
-	private V bitmap;
-	private TagsTable<T, V> table;
+public class RecordSet<T> {
+	private Bitmap bitmap;
+	private TagsTable<T> table;
 
-	RecordSet(V bitmap, TagsTable<T,V> table) {
+	RecordSet(Bitmap bitmap, TagsTable<T> table) {
 		this.bitmap = bitmap;
 		this.table = table;
 	}
@@ -28,11 +28,10 @@ public class RecordSet<T,V extends Bitmap> {
 	}
 	
 	/** Gets the tags of a record.
-	 * @param id The id of the record 
+	 * @param id The id of the record (as returned by {@link #getIds()} iterator).
 	 * @return a new Iterator
 	 */
 	public Iterator<T> getTags(int id) {
-		//FIXME
-		throw new RuntimeException("Not yet implemented");
+		return table.getTags(id);
 	}
 }

@@ -1,33 +1,43 @@
 package com.fathzer.imt;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
+import org.apache.commons.collections4.IteratorUtils;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 import com.fathzer.imt.TagsTable;
-import com.fathzer.imt.implementation.BitSetBitmap;
-import com.fathzer.imt.implementation.RoaringBitmap;
 import com.fathzer.imt.implementation.SimpleTagsTableFactory;
 import com.fathzer.imt.util.IntIterator;
+import com.googlecode.javaewah.IteratorUtil;
 
 public class TableTest {
 
 	@Test
 	public void test() {
-		doTest (new TagsTable<String, RoaringBitmap>(SimpleTagsTableFactory.ROARING_FACTORY));
-		doTest (new TagsTable<String, BitSetBitmap>(SimpleTagsTableFactory.BITSET_FACTORY));
+		doTest (new TagsTable<String>(SimpleTagsTableFactory.ROARING_FACTORY));
+		doTest (new TagsTable<String>(SimpleTagsTableFactory.BITSET_FACTORY));
 //		return new TagsTable<String, T>(new SimpleTableFactory<T>(BitmapAdapter.EWAH64));
 	}
 	
 
-	private <T extends Bitmap> void doTest(TagsTable<String, T> table) {
+	private <T extends Bitmap> void doTest(TagsTable<String> table) {
 		int index = table.addRecord(new Record("A/C/E"), false);
 		assertEquals(0, index);
+		List<String> tags = IteratorUtils.toList(table.getTags(index));
+		assertEquals(3,tags.size());
+		Collections.sort(tags);
+		assertEquals("A", tags.get(0));
+		assertEquals("C", tags.get(1));
+		assertEquals("E", tags.get(2));
 		
 		assertEquals(1, table.addRecord(new Record("B/D/F"), false));
-		RecordSet<String, T> recordSet = table.evaluate("A && C");
+		RecordSet<String> recordSet = table.evaluate("A && C");
 		IntIterator iterator = recordSet.getIds();
 		assertEquals(0, iterator.next());
 		assertEquals(1, recordSet.size());
@@ -56,8 +66,8 @@ public class TableTest {
 		doAddUnknown(SimpleTagsTableFactory.BITSET_FACTORY);
 	}
 	
-	private <T extends Bitmap> void doAddUnknown(SimpleTagsTableFactory<T> factory) {
-		TagsTable<String, T> table = new TagsTable<String, T>(factory);
+	private <T extends Bitmap> void doAddUnknown(SimpleTagsTableFactory factory) {
+		TagsTable<String> table = new TagsTable<String>(factory);
 		table.addRecord(new Record("A/C/E"), true);
 	}
 	
@@ -66,8 +76,8 @@ public class TableTest {
 		doEvaluateUnknown(SimpleTagsTableFactory.BITSET_FACTORY);
 	}
 	
-	private <T extends Bitmap> void doEvaluateUnknown(SimpleTagsTableFactory<T> factory) {
-		TagsTable<String, T> table = new TagsTable<String, T>(factory);
+	private <T extends Bitmap> void doEvaluateUnknown(SimpleTagsTableFactory factory) {
+		TagsTable<String> table = new TagsTable<String>(factory);
 		table.evaluate("A");
 	}
 	
@@ -76,8 +86,8 @@ public class TableTest {
 		doDuplicated(SimpleTagsTableFactory.BITSET_FACTORY);
 	}
 	
-	private <T extends Bitmap> void doDuplicated(SimpleTagsTableFactory<T> factory) {
-		TagsTable<String, T> table = new TagsTable<String, T>(factory);
+	private void doDuplicated(SimpleTagsTableFactory factory) {
+		TagsTable<String> table = new TagsTable<String>(factory);
 		table.addTags(Arrays.asList(new String[]{"A","A"}), null);
 	}
 }

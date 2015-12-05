@@ -12,16 +12,16 @@ import com.fathzer.soft.javaluator.AbstractEvaluator;
 /** A simple factory that uses a Hashmap and default evaluator.
  * @param <V> The bitmap type.
  */
-public abstract class SimpleTagsTableFactory<V extends Bitmap> implements TagsTableFactory<String, V> {
-	public static final SimpleTagsTableFactory<RoaringBitmap> ROARING_FACTORY = new SimpleTagsTableFactory<RoaringBitmap>() {
+public abstract class SimpleTagsTableFactory implements TagsTableFactory<String> {
+	public static final SimpleTagsTableFactory ROARING_FACTORY = new SimpleTagsTableFactory() {
 		@Override
-		public RoaringBitmap create() {
+		public Bitmap create() {
 			return new RoaringBitmap();
 		}
 	};
-	public static final SimpleTagsTableFactory<BitSetBitmap> BITSET_FACTORY = new SimpleTagsTableFactory<BitSetBitmap>() {
+	public static final SimpleTagsTableFactory BITSET_FACTORY = new SimpleTagsTableFactory() {
 		@Override
-		public BitSetBitmap create() {
+		public Bitmap create() {
 			return new BitSetBitmap();
 		}
 	};
@@ -30,13 +30,13 @@ public abstract class SimpleTagsTableFactory<V extends Bitmap> implements TagsTa
 	}
 
 	@Override
-	public AbstractEvaluator<V> buildEvaluator(TagsTable<String, V> table) {
-		return new DefaultEvaluator<String, V>(table, this);
+	public AbstractEvaluator<Bitmap> buildEvaluator(TagsTable<String> table) {
+		return new DefaultEvaluator<String>(table);
 	}
 
 	@Override
-	public BitmapMap<String, V> buildmap() {
-		return new DefaultBitmapMap<String, V>();
+	public BitmapMap<String> buildmap() {
+		return new DefaultBitmapMap<String>();
 	}
 
 	@Override
@@ -44,16 +44,16 @@ public abstract class SimpleTagsTableFactory<V extends Bitmap> implements TagsTa
 		return string;
 	}
 	
-	private static class DefaultBitmapMap<K,V> extends HashMap<K, V> implements BitmapMap<K, V> {
+	private static class DefaultBitmapMap<K> extends HashMap<K, Bitmap> implements BitmapMap<K> {
 		private static final long serialVersionUID = 1L;
 	}
 
 	@Override
-	public abstract V create();
+	public abstract Bitmap create();
 
 	@Override
-	public V or(Iterator<V> bitmaps) {
-		V result = create();
+	public Bitmap or(Iterator<Bitmap> bitmaps) {
+		Bitmap result = create();
 		while (bitmaps.hasNext()) {
 			result.or(bitmaps.next());
 		}
