@@ -55,6 +55,11 @@ public class TagsTable<T> implements Cloneable {
 				return result;
 			}
 		}
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	private int size;
@@ -193,7 +198,8 @@ public class TagsTable<T> implements Cloneable {
 	
 	/** Gets the set of records having a tag.
 	 * @param tag The tag
-	 * @return a record set. <b>Warning:</b> There are side effects between the returned instance and the table, do not modify the record set !!!
+	 * @return a record set.
+	 * <br><b>Warning:</b> There are side effects between the returned instance and the table.
 	 */
 	public Bitmap getBitMapIndex(T tag) {
 		return this.tagToBitmap.get(tag);
@@ -269,5 +275,50 @@ public class TagsTable<T> implements Cloneable {
 			throw new IllegalArgumentException();
 		}
 		return new TagsIterator(id);
+	}
+	
+	/** Tests whether a record contains a tag. 
+	 * @param id A record id.
+	 * @param tag A tag
+	 * @return true if the record contains the tag
+	 */
+	public boolean contains(int id, T tag) {
+		Bitmap bitmap = tagToBitmap.get(tag);
+		return bitmap==null?false:bitmap.contains(id);
+	}
+
+	/** Adds a tag to a record. 
+	 * @param id A record id.
+	 * @param tag A tag
+	 * @param failIfUnknown true if the method should fail if a tag is unknown, false if unknown tags should be added automatically.
+	 * @throws UnknownTagException if a tag is unknown and <i>failIfUnknown</i> is true.
+	 * @throws IllegalStateException if this is locked
+	 */
+	public void add(int id, T tag, boolean failIfUnknown) {
+		check();
+		Bitmap bitmap = tagToBitmap.get(tag);
+		if (bitmap==null) {
+			if (failIfUnknown) {
+				throw new UnknownTagException(tag.toString());
+			} else {
+				bitmap = factory.create();
+				tagToBitmap.put(tag, bitmap);
+			}
+		}
+		bitmap.add(id);
+	}
+
+	/** Removes a tag from a record.
+	 * <br>If the record not contains the tag, this method does nothing.
+	 * @param id A record id.
+	 * @param tag A tag
+	 * @throws IllegalStateException if this is locked
+	 */
+	public void add(int id, T tag) {
+		check();
+		Bitmap bitmap = tagToBitmap.get(tag);
+		if (bitmap!=null) {
+			bitmap.remove(id);
+		}
 	}
 }
