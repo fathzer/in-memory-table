@@ -314,7 +314,7 @@ public class TagsTable<T> implements Cloneable {
 	 * @param tag A tag
 	 * @throws IllegalStateException if this is locked
 	 */
-	public void add(int id, T tag) {
+	public void remove(int id, T tag) {
 		check();
 		Bitmap bitmap = tagToBitmap.get(tag);
 		if (bitmap!=null) {
