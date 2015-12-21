@@ -10,16 +10,19 @@ public interface Bitmap extends Cloneable {
 	
 	/** Makes the union of this bitmap with another one.
 	 * @param bitmap second bitmap
+	 * @return a new Bitmap
 	 */
 	Bitmap or(Bitmap bitmap);
 		
 	/** Makes the intersection of this bitmap with another one.
 	 * @param bitmap second bitmap
+	 * @return a new Bitmap
 	 */
 	Bitmap and(Bitmap bitmap);
 	
 	/** Negates this bitmap.
 	 * @param size The length of the bitmap (bits after this length will not be set)
+	 * @return a new Bitmap
 	 */
 	Bitmap not(int size);
 	
@@ -32,6 +35,7 @@ public interface Bitmap extends Cloneable {
 	 */
 	IntIterator getIterator();
 	
+
 	/** Tests whether this bitmap is empty.
 	 * @return true if no bit is set.
 	 */

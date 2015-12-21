@@ -10,7 +10,7 @@ import com.fathzer.soft.javaluator.AbstractEvaluator;
 /** A table is a set of records. Each of them has contains some tags and are identified by a positive or null integer.
  * <br>It is stored in memory using bitmap indexes in order to provide fast requests on logical expression on tags.
  * <br>Example: Let's say you have a vehicle set. Tags are "red", "green", "blue", "fast", "cheap", "electrical".
- * Requests can be "red && electrical" or "(fast && red) || (cheap)".
+ * Requests can be "red &amp;&amp; electrical" or "(fast &amp;&amp; red) || (cheap)".
  * A request's result is a record set that can be accessed to get its cardinality and the tags of each of its records.
  * <br><br>
  * This class is not thread safe. Many threads can call {@link #evaluate(String)} concurrently, but not adding new tags or records.
@@ -71,7 +71,7 @@ public class TagsTable<T> implements Cloneable {
 	private boolean isLocked;
 	
 	/** Creates a new empty table.
-	 * @param adapter A TagsTableFactory.
+	 * @param factory the factory used to build the table.
 	 */
 	public TagsTable(final TagsTableFactory<T> factory) {
 		this.factory = factory;
@@ -91,7 +91,7 @@ public class TagsTable<T> implements Cloneable {
 	/** Adds some tags to this table.
 	 * <br>Existing records are updated according to second arguments
 	 * @param tags the tags to add to the table
-	 * @param recordTags Each element of this list contains the existing record indexes where tag should be added, or null to not attached created tags to any records.
+	 * @param tagRecords Each element of this list contains the existing record indexes where tag should be added, or null to not attached created tags to any records.
 	 * @throws DuplicatedTagException if a tag is already declared in the table
 	 * @throws IllegalArgumentException if a tagRecords is not null and has not same size as tags.
 	 * @throws IllegalStateException if this is locked
@@ -184,7 +184,7 @@ public class TagsTable<T> implements Cloneable {
 
 	/** Gets the set of records that verify a logical expression.
 	 * @param logicalExpr a logical expression.
-	 * <br>Supported operators are ! (not), && (and) and || (or).
+	 * <br>Supported operators are ! (not), &amp;&amp; (and) and || (or).
 	 * @return a record set
 	 */
 	public RecordSet<T> evaluate(String logicalExpr) {
