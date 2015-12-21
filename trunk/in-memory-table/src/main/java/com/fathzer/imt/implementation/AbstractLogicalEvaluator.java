@@ -17,6 +17,10 @@ public abstract class AbstractLogicalEvaluator<T> extends AbstractEvaluator<Bitm
 		this.table = table;
 	}
 	
+	protected TagsTable<T> getTable() {
+		return this.table;
+	}
+	
 	@Override
 	protected Bitmap toValue(String literal, Object evaluationContext) {
 		Bitmap result = this.table.getBitMapIndex(table.getFactory().stringToTag(literal));

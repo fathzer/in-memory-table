@@ -9,8 +9,7 @@ import com.fathzer.imt.TagsTable;
 import com.fathzer.imt.TagsTableFactory;
 import com.fathzer.soft.javaluator.AbstractEvaluator;
 
-/** A simple factory that uses a Hashmap and default evaluator.
- * @param <V> The bitmap type.
+/** A simple factory that uses a HashMap and default evaluator.
  */
 public abstract class SimpleTagsTableFactory implements TagsTableFactory<String> {
 	public static final SimpleTagsTableFactory ROARING_FACTORY = new SimpleTagsTableFactory() {

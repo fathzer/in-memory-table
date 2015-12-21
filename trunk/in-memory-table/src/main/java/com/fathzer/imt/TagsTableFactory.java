@@ -6,7 +6,7 @@ import com.fathzer.soft.javaluator.AbstractEvaluator;
 
 /** This interface allow to create table based on various bitmap implementations.
  * <br>It groups basic operations required on bitmaps.
- * @param <V> The underlying bitmap class
+ * @param <T> The tags class
  */
 public interface TagsTableFactory<T> {
 	/** Creates a new empty Bitmap.
