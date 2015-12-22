@@ -7,7 +7,7 @@
 		<version>1.0.2</version>
 	</parent>
 	<artifactId>in-memory-table</artifactId>
-	<version>0.0.4-SNAPSHOT</version>
+	<version>0.0.5-SNAPSHOT</version>
 	<scm>
 		<url>http://svn.code.sf.net/p/in-memory-table/code/trunk/in-memory-table</url>
 		<connection>http://svn.code.sf.net/p/in-memory-table/code/trunk/in-memory-table</connection>
@@ -22,7 +22,7 @@
 		<dependency>
 			<groupId>com.googlecode.javaewah</groupId>
 			<artifactId>JavaEWAH</artifactId>
-			<version>1.1.2</version>
+			<version>1.1.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>

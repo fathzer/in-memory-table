@@ -8,23 +8,33 @@ public interface Bitmap extends Cloneable {
 	 */
 	int getCardinality();
 	
-	/** Makes the union of this bitmap with another one.
+	/** Performs the union of this bitmap with another one.
+	 * <br>This bitmap is modified.
 	 * @param bitmap second bitmap
-	 * @return a new Bitmap
 	 */
-	Bitmap or(Bitmap bitmap);
+	void or(Bitmap bitmap);
+	
+	/** Performs a logical XOR of this bitmap with another one.
+	 * <br>This bitmap is modified.
+	 * @param bitmap second bitmap
+	 */
+	void xor(Bitmap bitmap);
 		
-	/** Makes the intersection of this bitmap with another one.
+	/** Performs the intersection of this bitmap with another one.
+	 * <br>This bitmap is modified.
 	 * @param bitmap second bitmap
-	 * @return a new Bitmap
 	 */
-	Bitmap and(Bitmap bitmap);
+	void and(Bitmap bitmap);
+	
+	/** Clears all of the bits in this Bitmap whose corresponding bit is set in another one.
+	 * @param bitmap second bitmap
+	 */
+	void andNot(Bitmap bitmap);
 	
 	/** Negates this bitmap.
 	 * @param size The length of the bitmap (bits after this length will not be set)
-	 * @return a new Bitmap
 	 */
-	Bitmap not(int size);
+	void not(int size);
 	
 	/**  Recovers allocated but unused memory
 	 */
@@ -35,7 +45,6 @@ public interface Bitmap extends Cloneable {
 	 */
 	IntIterator getIterator();
 	
-
 	/** Tests whether this bitmap is empty.
 	 * @return true if no bit is set.
 	 */
