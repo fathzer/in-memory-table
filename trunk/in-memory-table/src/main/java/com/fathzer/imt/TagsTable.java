@@ -189,10 +189,14 @@ public class TagsTable<T> implements Cloneable {
 	 */
 	public RecordSet<T> evaluate(String logicalExpr) {
 		Bitmap bitmap = evaluator.get().evaluate(logicalExpr);
-		if (bitmap.isLocked()) {
-			bitmap = bitmap.clone();
+		if (logicalSize!=size) {
+			// If bitmap is not locked, but the table is, it means the bitmap was create by the evaluator itself
+			// So, it is not useful to clone it.
+			if (bitmap.isLocked() || !isLocked()) {
+				bitmap = bitmap.clone();
+			}
+			bitmap.andNot(deletedRecords);
 		}
-		bitmap.and(deletedRecords);
 		return new RecordSet<T>(bitmap.getLocked(), this);
 	}
 	

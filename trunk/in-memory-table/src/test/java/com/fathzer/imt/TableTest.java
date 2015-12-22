@@ -17,10 +17,9 @@ public class TableTest {
 
 	@Test
 	public void test() {
-		doTest (new TagsTable<String>(SimpleTagsTableFactory.ROARING_FACTORY));
 		doTest (new TagsTable<String>(SimpleTagsTableFactory.BITSET_FACTORY));
+		doTest (new TagsTable<String>(SimpleTagsTableFactory.ROARING_FACTORY));
 	}
-	
 
 	private <T extends Bitmap> void doTest(TagsTable<String> table) {
 		int index = table.addRecord(new Record("A/C/E"), false);
@@ -34,9 +33,9 @@ public class TableTest {
 		
 		assertEquals(1, table.addRecord(new Record("B/D/F"), false));
 		RecordSet<String> recordSet = table.evaluate("A && C");
+		assertEquals(1, recordSet.size());
 		IntIterator iterator = recordSet.getIds();
 		assertEquals(0, iterator.next());
-		assertEquals(1, recordSet.size());
 		
 		assertEquals(0, table.evaluate("A && B").size());
 		
