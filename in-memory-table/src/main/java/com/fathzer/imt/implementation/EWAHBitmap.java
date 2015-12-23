@@ -2,53 +2,55 @@ package com.fathzer.imt.implementation;
 
 import com.fathzer.imt.Bitmap;
 import com.fathzer.imt.util.IntIterator;
+import com.googlecode.javaewah.EWAHCompressedBitmap;
 
-public class RoaringBitmap implements Bitmap, Cloneable {
-	private org.roaringbitmap.RoaringBitmap set;
+public class EWAHBitmap implements Bitmap, Cloneable {
+	private EWAHCompressedBitmap set;
 	private boolean isLocked;
 	
-	public RoaringBitmap() {
-		this(new org.roaringbitmap.RoaringBitmap());
+	public EWAHBitmap() {
+		this(new EWAHCompressedBitmap());
 	}
 	
-	private RoaringBitmap(org.roaringbitmap.RoaringBitmap set) {
+	private EWAHBitmap(EWAHCompressedBitmap set) {
 		this.set = set;
 		this.isLocked = false;
 	}
 
 	@Override
 	public int getCardinality() {
-		return set.getCardinality();
+		return set.cardinality();
 	}
 	
 	@Override
 	public void or(Bitmap bitmap) {
 		check();
-		this.set.or(((RoaringBitmap)bitmap).set);
+		set = set.or(((EWAHBitmap)bitmap).set);
 	}
 
 	@Override
 	public void xor(Bitmap bitmap) {
 		check();
-		set.xor(((RoaringBitmap)bitmap).set);
+		set = set.xor(((EWAHBitmap)bitmap).set);
 	}
 
 	@Override
 	public void and(Bitmap bitmap) {
 		check();
-		this.set.and(((RoaringBitmap)bitmap).set);
+		set = set.and(((EWAHBitmap)bitmap).set);
 	}
 
 	@Override
 	public void andNot(Bitmap bitmap) {
 		check();
-		set.andNot(((RoaringBitmap)bitmap).set);
+		set = set.andNot(((EWAHBitmap)bitmap).set);
 	}
 
 	@Override
 	public void not(int size) {
 		check();
-		this.set.flip(0, size);
+		this.set.setSizeInBits(size, false);
+		this.set.not();
 	}
 
 	@Override
@@ -59,7 +61,7 @@ public class RoaringBitmap implements Bitmap, Cloneable {
 	
 	@Override
 	public IntIterator getIterator() {
-		final org.roaringbitmap.IntIterator iter = set.getIntIterator();
+		final com.googlecode.javaewah.IntIterator iter = set.intIterator();
 		return new IntIterator() {
 			@Override
 			public boolean hasNext() {
@@ -80,24 +82,24 @@ public class RoaringBitmap implements Bitmap, Cloneable {
 
 	@Override
 	public boolean contains(int index) {
-		return set.contains(index);
+		return set.get(index);
 	}
 
 	@Override
 	public void add(int index) {
 		check();
-		set.add(index);
+		set.set(index);
 	}
 
 	@Override
 	public void remove(int index) {
 		check();
-		set.remove(index);
+		set.clear(index);
 	}
 
 	@Override
 	public long getSizeInBytes() {
-		return set.getSizeInBytes();
+		return set.sizeInBytes();
 	}
 
 	@Override
@@ -105,8 +107,12 @@ public class RoaringBitmap implements Bitmap, Cloneable {
 		if (isLocked) {
 			return this;
 		} else {
-			RoaringBitmap result = (RoaringBitmap) clone();
-			result.set = set.clone();
+			EWAHBitmap result = (EWAHBitmap) clone();
+			try {
+				result.set = set.clone();
+			} catch (CloneNotSupportedException e) {
+				throw new RuntimeException(e);
+			}
 			result.set.trim();
 			result.isLocked = true;
 			return result;
@@ -114,9 +120,9 @@ public class RoaringBitmap implements Bitmap, Cloneable {
 	}
 	
 	@Override
-	public RoaringBitmap clone() {
+	public EWAHBitmap clone() {
 		try {
-			RoaringBitmap result = (RoaringBitmap) super.clone();
+			EWAHBitmap result = (EWAHBitmap) super.clone();
 			result.isLocked = false;
 			result.set = this.set.clone();
 			return result;
