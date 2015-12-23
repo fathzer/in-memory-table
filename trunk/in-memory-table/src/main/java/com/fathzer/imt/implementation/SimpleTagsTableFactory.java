@@ -18,6 +18,12 @@ public abstract class SimpleTagsTableFactory implements TagsTableFactory<String>
 			return new RoaringBitmap();
 		}
 	};
+	public static final SimpleTagsTableFactory EWAH_FACTORY = new SimpleTagsTableFactory() {
+		@Override
+		public Bitmap create() {
+			return new EWAHBitmap();
+		}
+	};
 	public static final SimpleTagsTableFactory BITSET_FACTORY = new SimpleTagsTableFactory() {
 		@Override
 		public Bitmap create() {

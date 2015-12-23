@@ -19,9 +19,10 @@ public class TableTest {
 	public void test() {
 		doTest (new TagsTable<String>(SimpleTagsTableFactory.BITSET_FACTORY));
 		doTest (new TagsTable<String>(SimpleTagsTableFactory.ROARING_FACTORY));
+		doTest (new TagsTable<String>(SimpleTagsTableFactory.EWAH_FACTORY));
 	}
 
-	private <T extends Bitmap> void doTest(TagsTable<String> table) {
+	private void doTest(TagsTable<String> table) {
 		int index = table.addRecord(new Record("A/C/E"), false);
 		assertEquals(0, index);
 		List<String> tags = IteratorUtils.toList(table.getTags(index));
