@@ -4,7 +4,7 @@ import com.fathzer.imt.Bitmap;
 import com.fathzer.imt.util.IntIterator;
 
 public class RoaringBitmap implements Bitmap, Cloneable {
-	private org.roaringbitmap.RoaringBitmap set;
+	public org.roaringbitmap.RoaringBitmap set;
 	private boolean isLocked;
 	
 	public RoaringBitmap() {

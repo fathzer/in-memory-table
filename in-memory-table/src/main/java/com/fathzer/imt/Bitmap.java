@@ -11,28 +11,33 @@ public interface Bitmap extends Cloneable {
 	/** Performs the union of this bitmap with another one.
 	 * <br>This bitmap is modified.
 	 * @param bitmap second bitmap
+	 * @throws IllegalStateException if this bitmap is locked
 	 */
 	void or(Bitmap bitmap);
 	
 	/** Performs a logical XOR of this bitmap with another one.
 	 * <br>This bitmap is modified.
 	 * @param bitmap second bitmap
+	 * @throws IllegalStateException if this bitmap is locked
 	 */
 	void xor(Bitmap bitmap);
 		
 	/** Performs the intersection of this bitmap with another one.
 	 * <br>This bitmap is modified.
 	 * @param bitmap second bitmap
+	 * @throws IllegalStateException if this bitmap is locked
 	 */
 	void and(Bitmap bitmap);
 	
 	/** Clears all of the bits in this Bitmap whose corresponding bit is set in another one.
 	 * @param bitmap second bitmap
+	 * @throws IllegalStateException if this bitmap is locked
 	 */
 	void andNot(Bitmap bitmap);
 	
 	/** Negates this bitmap.
 	 * @param size The length of the bitmap (bits after this length will not be set)
+	 * @throws IllegalStateException if this bitmap is locked
 	 */
 	void not(int size);
 	
@@ -58,11 +63,13 @@ public interface Bitmap extends Cloneable {
 	
 	/** Sets a bit in this bitmap to 1.
 	 * @param index The index of the bit to set
+	 * @throws IllegalStateException if this bitmap is locked
 	 */
 	void add(int index);
 
 	/** Set a bit in this bitmap to 0.
 	 * @param index The index of the bit to set to 0
+	 * @throws IllegalStateException if this bitmap is locked
 	 */
 	void remove(int index);
 	
