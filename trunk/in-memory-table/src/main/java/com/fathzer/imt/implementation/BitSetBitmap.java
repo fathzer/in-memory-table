@@ -24,26 +24,31 @@ public class BitSetBitmap implements Bitmap, Cloneable {
 	}
 	@Override
 	public void or(Bitmap bitmap) {
+		check();
 		set.or(((BitSetBitmap)bitmap).set);
 	}
 
 	@Override
 	public void xor(Bitmap bitmap) {
+		check();
 		set.xor(((BitSetBitmap)bitmap).set);
 	}
 
 	@Override
 	public void and(Bitmap bitmap) {
+		check();
 		set.and(((BitSetBitmap)bitmap).set);
 	}
 
 	@Override
 	public void andNot(Bitmap bitmap) {
+		check();
 		set.andNot(((BitSetBitmap)bitmap).set);
 	}
 
 	@Override
 	public void not(int size) {
+		check();
 		set.flip(0, size);
 	}
 
