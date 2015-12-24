@@ -106,7 +106,6 @@ public class RoaringBitmap implements Bitmap, Cloneable {
 			return this;
 		} else {
 			RoaringBitmap result = (RoaringBitmap) clone();
-			result.set = set.clone();
 			result.set.trim();
 			result.isLocked = true;
 			return result;
@@ -115,14 +114,7 @@ public class RoaringBitmap implements Bitmap, Cloneable {
 	
 	@Override
 	public RoaringBitmap clone() {
-		try {
-			RoaringBitmap result = (RoaringBitmap) super.clone();
-			result.isLocked = false;
-			result.set = this.set.clone();
-			return result;
-		} catch (CloneNotSupportedException e) {
-			throw new RuntimeException(e);
-		}
+		return new RoaringBitmap(set.clone());
 	}
 
 	@Override
