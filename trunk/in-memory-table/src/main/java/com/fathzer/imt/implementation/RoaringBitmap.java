@@ -4,7 +4,7 @@ import com.fathzer.imt.Bitmap;
 import com.fathzer.imt.util.IntIterator;
 
 public class RoaringBitmap implements Bitmap, Cloneable {
-	public org.roaringbitmap.RoaringBitmap set;
+	private org.roaringbitmap.RoaringBitmap set;
 	private boolean isLocked;
 	
 	public RoaringBitmap() {
@@ -126,5 +126,10 @@ public class RoaringBitmap implements Bitmap, Cloneable {
 		if (isLocked) {
 			throw new IllegalStateException();
 		}
+	}
+
+	@Override
+	public String toString() {
+		return set.toString();
 	}
 }
