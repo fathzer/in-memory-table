@@ -3,6 +3,7 @@ package com.fathzer.imt.implementation;
 import java.util.Iterator;
 
 import com.fathzer.imt.Bitmap;
+import com.fathzer.imt.Evaluator;
 import com.fathzer.imt.TagsTable;
 import com.fathzer.imt.UnknownTagException;
 import com.fathzer.imt.util.IntIterator;
@@ -10,22 +11,40 @@ import com.fathzer.soft.javaluator.AbstractEvaluator;
 import com.fathzer.soft.javaluator.Operator;
 import com.fathzer.soft.javaluator.Parameters;
 
-public abstract class AbstractLogicalEvaluator<T> extends AbstractEvaluator<Bitmap> {
+/** A default logical evaluator based on the <a href="javaluator.fathzer.com">javaluator library</a>
+ * @author Jean-Marc Astesana
+ * @param <T> The type of keys used in the tags table on which this evaluator works.
+ */
+public abstract class AbstractLogicalEvaluator<T> extends AbstractEvaluator<Bitmap> implements Evaluator {
 	private final TagsTable<T> table;
 
-	public AbstractLogicalEvaluator(Parameters params, TagsTable<T> table) {
+	/** Constructor.
+	 * @param params The evaluator parameters (see <a href="javaluator.fathzer.com/en/doc/javadoc/com/fathzer/soft/javaluator/Parameters.html">Parameter</a>)
+	 * @param table The table on which to evaluate expressions.
+	 */
+	protected AbstractLogicalEvaluator(Parameters params, TagsTable<T> table) {
 		super(params);
 		this.table = table;
 	}
 	
 	@Override
 	protected Bitmap toValue(String literal, Object evaluationContext) {
-		Bitmap result = this.table.getBitMapIndex(this.table.getFactory().stringToTag(literal));
+		Bitmap result = this.table.getBitMapIndex(stringToTag(literal));
 		if (result==null) {
-			throw new UnknownTagException(literal);
+			if ((boolean) evaluationContext) {
+				throw new UnknownTagException(literal);
+			} else {
+				result = this.table.getFactory().create();
+			}
 		}
 		return result;
 	}
+	
+	/** Converts a variable name found in a logical expression to a tag.
+	 * @param variable The variable name
+	 * @return the tag corresponding to that variable.
+	 */
+	protected abstract T stringToTag(String variable);
 
 	@Override
 	protected Bitmap evaluate(Operator operator, Iterator<Bitmap> operands, Object evaluationContext) {
@@ -55,16 +74,27 @@ public abstract class AbstractLogicalEvaluator<T> extends AbstractEvaluator<Bitm
 	}
 	
 	@Override
-	public Bitmap evaluate(String expression, Object evaluationContext) {
-		Bitmap result = super.evaluate(expression, evaluationContext);
+	public Bitmap evaluate(String expression, boolean failIfUnknown) {
+		Bitmap result = super.evaluate(expression, failIfUnknown);
 		if (result instanceof Container) {
 			result = ((Container) result).internal;
 		}
 		return result;
 	}
 
+	/** Gets the NOT operator.
+	 * @return the NOT operator.
+	 */
 	protected abstract Operator getNegate();
+
+	/** Gets the AND operator.
+	 * @return the and operator.
+	 */
 	protected abstract Operator getAnd();
+
+	/** Gets the OR operator.
+	 * @return the OR operator.
+	 */
 	protected abstract Operator getOr();
 	
 	private static class Container implements Bitmap {

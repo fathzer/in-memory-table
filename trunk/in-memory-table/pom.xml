@@ -41,7 +41,7 @@
 			<artifactId>javaluator</artifactId>
 			<version>3.0.1</version>
 		</dependency>
-		<dependency>
+		<!-- dependency>
 			<groupId>net.openhft</groupId>
 			<artifactId>chronicle-map</artifactId>
 			<version>2.3.9</version>
@@ -51,7 +51,7 @@
 					<artifactId>tools</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
+		</dependency-->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

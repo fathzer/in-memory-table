@@ -5,13 +5,17 @@ import com.fathzer.soft.javaluator.BracketPair;
 import com.fathzer.soft.javaluator.Operator;
 import com.fathzer.soft.javaluator.Parameters;
 
-public class DefaultEvaluator<T> extends AbstractLogicalEvaluator<T> {
+/** A default logical AbstractLogicalEvaluator that uses ! as NOT operator, &amp;&amp; as AND and || as OR.
+ * @author Jean-Marc Astesana
+ * @param <T> The type of the table tags.
+ */
+public abstract class DefaultEvaluator<T> extends AbstractLogicalEvaluator<T> {
 	/** The negate unary operator.*/
-  private final static Operator NEGATE = new Operator("!", 1, Operator.Associativity.RIGHT, 3);
+  private static final Operator NEGATE = new Operator("!", 1, Operator.Associativity.RIGHT, 3);
   /** The logical AND operator.*/
   private static final Operator AND = new Operator("&&", 2, Operator.Associativity.LEFT, 2);
   /** The logical OR operator.*/
-  private final static Operator OR = new Operator("||", 2, Operator.Associativity.LEFT, 1);
+  private static final Operator OR = new Operator("||", 2, Operator.Associativity.LEFT, 1);
   private static final Parameters PARAMETERS;
 
 	static {

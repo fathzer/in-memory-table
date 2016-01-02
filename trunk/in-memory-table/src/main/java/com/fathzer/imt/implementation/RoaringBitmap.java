@@ -2,17 +2,17 @@ package com.fathzer.imt.implementation;
 
 import com.fathzer.imt.Bitmap;
 import com.fathzer.imt.util.IntIterator;
+import com.fathzer.imt.util.UnexpectedCloneNotSupportedException;
 
+/** A Bitmap backed by the excellent <a href="https://github.com/lemire/RoaringBitmap">Roaring library from D. Lemire</a>. 
+ * @author Jean-Marc Astesana
+ */
 public class RoaringBitmap implements Bitmap, Cloneable {
 	private org.roaringbitmap.RoaringBitmap set;
 	private boolean isLocked;
 	
 	public RoaringBitmap() {
-		this(new org.roaringbitmap.RoaringBitmap());
-	}
-	
-	private RoaringBitmap(org.roaringbitmap.RoaringBitmap set) {
-		this.set = set;
+		this.set = new org.roaringbitmap.RoaringBitmap();
 		this.isLocked = false;
 	}
 
@@ -114,7 +114,15 @@ public class RoaringBitmap implements Bitmap, Cloneable {
 	
 	@Override
 	public RoaringBitmap clone() {
-		return new RoaringBitmap(set.clone());
+		RoaringBitmap result;
+		try {
+			result = (RoaringBitmap) super.clone();
+			result.set = this.set.clone();
+			result.isLocked = false;
+			return result;
+		} catch (CloneNotSupportedException e) {
+			throw new UnexpectedCloneNotSupportedException(e);
+		}
 	}
 
 	@Override

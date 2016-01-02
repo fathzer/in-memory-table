@@ -4,7 +4,11 @@ import java.util.BitSet;
 
 import com.fathzer.imt.Bitmap;
 import com.fathzer.imt.util.IntIterator;
+import com.fathzer.imt.util.UnexpectedCloneNotSupportedException;
 
+/** A Bitmap backed by the java.util.BitSet class. 
+ * @author Jean-Marc Astesana
+ */
 public class BitSetBitmap implements Bitmap, Cloneable {
 	private BitSet set;
 	private boolean isLocked;
@@ -109,7 +113,7 @@ public class BitSetBitmap implements Bitmap, Cloneable {
 			result.set = (BitSet) this.set.clone();
 			return result;
 		} catch (CloneNotSupportedException e) {
-			throw new RuntimeException(e);
+			throw new UnexpectedCloneNotSupportedException(e);
 		}
 	}
 

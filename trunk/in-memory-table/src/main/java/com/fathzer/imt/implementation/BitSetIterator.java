@@ -5,7 +5,7 @@ import java.util.NoSuchElementException;
 
 import com.fathzer.imt.util.IntIterator;
 
-public class BitSetIterator implements IntIterator {
+class BitSetIterator implements IntIterator {
 	private int next = -1;
 	private BitSet bitset;
 	

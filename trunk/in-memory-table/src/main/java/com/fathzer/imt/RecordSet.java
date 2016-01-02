@@ -2,11 +2,14 @@ package com.fathzer.imt;
 
 import com.fathzer.imt.util.IntIterator;
 
-public class RecordSet<T> {
+/** A set of records.
+ * @author Jean-Marc Astesana
+ */
+public class RecordSet {
 	private Bitmap bitmap;
-	private TagsTable<T> table;
+	private TagsTable<?> table;
 
-	RecordSet(Bitmap bitmap, TagsTable<T> table) {
+	RecordSet(Bitmap bitmap, TagsTable<?> table) {
 		this.bitmap = bitmap;
 		this.table = table;
 	}
@@ -28,7 +31,7 @@ public class RecordSet<T> {
 	/** Gets this record's table.
 	 * @return The table the record set on which the record set was built.
 	 */
-	public TagsTable<T> getTable() {
+	public TagsTable<?> getTable() {
 		return table;
 	}
 }
