@@ -2,11 +2,9 @@ package com.fathzer.imt;
 
 import java.util.Iterator;
 
-import com.fathzer.soft.javaluator.AbstractEvaluator;
-
-/** This interface allow to create table based on various bitmap implementations.
+/** A factory that allows to create table based on various bitmap implementations.
  * <br>It groups basic operations required on bitmaps.
- * @param <T> The tags class
+ * @param <T> The type of the tags
  */
 public interface TagsTableFactory<T> {
 	/** Creates a new empty Bitmap.
@@ -21,10 +19,14 @@ public interface TagsTableFactory<T> {
 	 */
 	Bitmap or(Iterator<Bitmap> bitmaps);
 
-	AbstractEvaluator<Bitmap> buildEvaluator(TagsTable<T> table);
+	/** Builds an evaluator.
+	 * @param table The table on which evalations will be made.
+	 * @return An new evaluator.
+	 */
+	Evaluator buildEvaluator(TagsTable<T> table);
 
-	//TODO Have a look and test https://github.com/OpenHFT/Chronicle-Map#what-is-the-difference-between-sharedhashmap-and-chroniclemap
+	/** Builds the object the maps tags to bitmaps.
+	 * @return a new map.
+	 */
 	BitmapMap<T> buildmap();
-
-	T stringToTag(String string);
 }

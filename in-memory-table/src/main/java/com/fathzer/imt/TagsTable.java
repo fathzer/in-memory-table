@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import com.fathzer.imt.util.IntIterator;
-import com.fathzer.soft.javaluator.AbstractEvaluator;
+import com.fathzer.imt.util.UnexpectedCloneNotSupportedException;
 
 /** A table is a set of records. Each of them has contains some tags and are identified by a positive or null integer.
  * <br>It is stored in memory using bitmap indexes in order to provide fast requests on logical expression on tags.
@@ -67,7 +67,7 @@ public class TagsTable<T> implements Cloneable {
 	private TagsTableFactory<T> factory;
 	private Bitmap deletedRecords;
 	private BitmapMap<T> tagToBitmap;
-	private ThreadLocal<AbstractEvaluator<Bitmap>> evaluator;
+	private Evaluator evaluator;
 	private boolean isLocked;
 	
 	/** Creates a new empty table.
@@ -76,12 +76,7 @@ public class TagsTable<T> implements Cloneable {
 	public TagsTable(final TagsTableFactory<T> factory) {
 		this.factory = factory;
 		this.deletedRecords = factory.create();
-		this.evaluator = new ThreadLocal<AbstractEvaluator<Bitmap>>() {
-			@Override
-			protected AbstractEvaluator<Bitmap> initialValue() {
-				return factory.buildEvaluator(TagsTable.this);
-			}
-		};
+		this.evaluator = factory.buildEvaluator(TagsTable.this);
 		this.tagToBitmap = factory.buildmap();
 		this.isLocked = false;
 		this.logicalSize = 0;
@@ -185,10 +180,12 @@ public class TagsTable<T> implements Cloneable {
 	/** Gets the set of records that verify a logical expression.
 	 * @param logicalExpr a logical expression.
 	 * <br>Supported operators are ! (not), &amp;&amp; (and) and || (or).
+	 * @param failIfUnknown true if the method should fail if a tag is unknown, false if unknown tags should be added automatically.
 	 * @return a record set
+	 * @throws UnknownTagException if the expression refers to an unknown tag and <i>failIfUnknown</i> is true. Otherwise unknown tags are considered false.
 	 */
-	public RecordSet<T> evaluate(String logicalExpr) {
-		Bitmap bitmap = evaluator.get().evaluate(logicalExpr);
+	public RecordSet evaluate(String logicalExpr, boolean failIfUnknown) {
+		Bitmap bitmap = evaluator.evaluate(logicalExpr, failIfUnknown);
 		if (logicalSize!=size) {
 			// If bitmap is not locked, but the table is, it means the bitmap was create by the evaluator itself
 			// So, it is not useful to clone it.
@@ -197,7 +194,7 @@ public class TagsTable<T> implements Cloneable {
 			}
 			bitmap.andNot(deletedRecords);
 		}
-		return new RecordSet<T>(bitmap.getLocked(), this);
+		return new RecordSet(bitmap.getLocked(), this);
 	}
 	
 	/** Gets the set of records having a tag.
@@ -232,7 +229,7 @@ public class TagsTable<T> implements Cloneable {
 			this.isLocked = false;
 			return result;
 		} catch (CloneNotSupportedException e) {
-			throw new RuntimeException(e);
+			throw new UnexpectedCloneNotSupportedException(e);
 		}
 	}
 	

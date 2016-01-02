@@ -2,6 +2,9 @@ package com.fathzer.imt;
 
 import com.fathzer.imt.util.IntIterator;
 
+/** A Bitmap (a compact representation of a sorted array of integers).
+ * @author Jean-Marc Astesana
+ */
 public interface Bitmap extends Cloneable {
 	/** Gets the cardinality of this bitmap.
 	 * @return a positive or null integer

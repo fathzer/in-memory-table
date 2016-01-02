@@ -2,8 +2,12 @@ package com.fathzer.imt.implementation;
 
 import com.fathzer.imt.Bitmap;
 import com.fathzer.imt.util.IntIterator;
+import com.fathzer.imt.util.UnexpectedCloneNotSupportedException;
 import com.googlecode.javaewah.EWAHCompressedBitmap;
 
+/** A Bitmap backed by the excellent <a href="https://github.com/lemire/javaewah">javaewah library from D. Lemire</a>. 
+ * @author Jean-Marc Astesana
+ */
 public class EWAHBitmap implements Bitmap, Cloneable {
 	private EWAHCompressedBitmap set;
 	private boolean isLocked;
@@ -110,12 +114,12 @@ public class EWAHBitmap implements Bitmap, Cloneable {
 			EWAHBitmap result = (EWAHBitmap) clone();
 			try {
 				result.set = set.clone();
+				result.set.trim();
+				result.isLocked = true;
+				return result;
 			} catch (CloneNotSupportedException e) {
-				throw new RuntimeException(e);
+				throw new UnexpectedCloneNotSupportedException(e);
 			}
-			result.set.trim();
-			result.isLocked = true;
-			return result;
 		}
 	}
 	
@@ -127,7 +131,7 @@ public class EWAHBitmap implements Bitmap, Cloneable {
 			result.set = this.set.clone();
 			return result;
 		} catch (CloneNotSupportedException e) {
-			throw new RuntimeException(e);
+			throw new UnexpectedCloneNotSupportedException(e);
 		}
 	}
 

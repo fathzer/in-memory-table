@@ -33,28 +33,32 @@ public class TableTest {
 		assertEquals("E", tags.get(2));
 		
 		assertEquals(1, table.addRecord(new Record("B/D/F"), false));
-		RecordSet<String> recordSet = table.evaluate("A && C");
+		RecordSet recordSet = table.evaluate("A && C", true);
 		assertEquals(1, recordSet.size());
 		IntIterator iterator = recordSet.getIds();
 		assertEquals(0, iterator.next());
 		
-		assertEquals(0, table.evaluate("A && B").size());
+		assertEquals(0, table.evaluate("A && B", true).size());
 		
-		recordSet = table.evaluate("A || D");
+		recordSet = table.evaluate("A || D", true);
 		iterator = recordSet.getIds();
 		assertEquals(0, iterator.next());
 		assertEquals(1, iterator.next());
 		assertEquals(2, recordSet.size());
 		
-		recordSet = table.evaluate("!E && A||D");
+		recordSet = table.evaluate("!E && A||D", true);
 		iterator = recordSet.getIds();
 		assertEquals(1, iterator.next());
 		assertEquals(1, recordSet.size());
 		
-		recordSet = table.evaluate("!E");
+		recordSet = table.evaluate("!E", true);
 		assertEquals(1, recordSet.size());
 		iterator = recordSet.getIds();
 		assertEquals(1, iterator.next());
+		
+		// Test unknown variables are false
+		recordSet = table.evaluate("Z", false);
+		assertEquals(0, recordSet.size());
 	}
 	
 	@Test(expected = UnknownTagException.class)
@@ -74,7 +78,7 @@ public class TableTest {
 	
 	private <T extends Bitmap> void doEvaluateUnknown(SimpleTagsTableFactory factory) {
 		TagsTable<String> table = new TagsTable<String>(factory);
-		table.evaluate("A");
+		table.evaluate("A", true);
 	}
 	
 	@Test(expected = DuplicatedTagException.class)
