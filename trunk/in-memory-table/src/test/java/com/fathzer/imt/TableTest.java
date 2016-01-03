@@ -59,14 +59,55 @@ public class TableTest {
 		// Test unknown variables are false
 		recordSet = table.evaluate("Z", false);
 		assertEquals(0, recordSet.size());
+		
+		// Test remove/add
+		table.remove(0, "A");
+		assertEquals(2, table.getSize());
+		assertEquals(2, table.getLogicalSize());
+		assertEquals(0, table.evaluate("A", true).size());
+		assertFalse(table.contains(0, "A"));
+		table.add(0, "A", false);
+		assertEquals(2, table.getLogicalSize());
+		assertEquals(1, table.evaluate("A", true).size());
+		assertTrue(table.contains(0, "A"));
+		
+		// Test delete
+		table.deleteRecord(0);
+		assertEquals(1, table.getLogicalSize());
+		assertEquals(0, table.evaluate("C", true).size());
+		
+		// Test add again and lock, unlock
+		table = table.getLocked();
+		assertTrue(table.isLocked());
+		table = (TagsTable<String>) table.clone();
+		assertFalse(table.isLocked());
+		table.addRecord(new Record("A/C/E"), false);
+		assertEquals(2, table.getLogicalSize());
+		assertEquals(1, table.evaluate("C", true).size());
+		
+		// Test add unknown
+		table.add(0, "ZZ", false);
+		assertTrue(table.contains(0, "ZZ"));
 	}
 	
+	@Test(expected = IllegalStateException.class)
+	public void testLocked() {
+		doLocked(SimpleTagsTableFactory.BITSET_FACTORY);
+	}
+	
+	private void doLocked(SimpleTagsTableFactory factory) {
+		TagsTable<String> table = new TagsTable<String>(factory);
+		table.addRecord(new Record("A/C/E"), false);
+		table = table.getLocked();
+		table.remove(0, "A");;
+	}
+
 	@Test(expected = UnknownTagException.class)
 	public void doAddUnknown() {
 		doAddUnknown(SimpleTagsTableFactory.BITSET_FACTORY);
 	}
 	
-	private <T extends Bitmap> void doAddUnknown(SimpleTagsTableFactory factory) {
+	private void doAddUnknown(SimpleTagsTableFactory factory) {
 		TagsTable<String> table = new TagsTable<String>(factory);
 		table.addRecord(new Record("A/C/E"), true);
 	}
@@ -76,7 +117,7 @@ public class TableTest {
 		doEvaluateUnknown(SimpleTagsTableFactory.BITSET_FACTORY);
 	}
 	
-	private <T extends Bitmap> void doEvaluateUnknown(SimpleTagsTableFactory factory) {
+	private void doEvaluateUnknown(SimpleTagsTableFactory factory) {
 		TagsTable<String> table = new TagsTable<String>(factory);
 		table.evaluate("A", true);
 	}

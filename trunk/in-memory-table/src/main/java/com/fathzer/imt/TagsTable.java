@@ -13,7 +13,7 @@ import com.fathzer.imt.util.UnexpectedCloneNotSupportedException;
  * Requests can be "red &amp;&amp; electrical" or "(fast &amp;&amp; red) || (cheap)".
  * A request's result is a record set that can be accessed to get its cardinality and the tags of each of its records.
  * <br><br>
- * This class is not thread safe. Many threads can call {@link #evaluate(String)} concurrently, but not adding new tags or records.
+ * This class is not thread safe. Many threads can call {@link #evaluate(String, boolean)} concurrently, but not adding new tags or records.
  * <br>
  * @author JM Astesana
  * @param <T> The type of tags. This class should implements hashcode and equals in order to be used in a Map.
@@ -211,7 +211,7 @@ public class TagsTable<T> implements Cloneable {
 	 * @return a new Table that contains a modifiable copy of this.
 	 */
 	@Override
-	public Object clone() {
+	public TagsTable<T> clone() {
 		try {
 			@SuppressWarnings("unchecked")
 			TagsTable<T> result = (TagsTable<T>) super.clone();
@@ -226,7 +226,8 @@ public class TagsTable<T> implements Cloneable {
 				result.tagToBitmap.put(key, freshBitmap);
 			}
 			result.deletedRecords = deletedRecords.clone();
-			this.isLocked = false;
+			result.evaluator = factory.buildEvaluator(result);
+			result.isLocked = false;
 			return result;
 		} catch (CloneNotSupportedException e) {
 			throw new UnexpectedCloneNotSupportedException(e);
@@ -240,7 +241,6 @@ public class TagsTable<T> implements Cloneable {
 		if (isLocked) {
 			return this;
 		} else {
-			@SuppressWarnings("unchecked")
 			TagsTable<T> result = (TagsTable<T>) clone();
 			result.tagToBitmap = factory.buildmap();
 			for (T key : tagToBitmap.keySet()) {
