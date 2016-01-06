@@ -120,7 +120,16 @@ public class TagsTable<T> implements Cloneable {
 	 */
 	public int addRecord(Iterator<T> record, boolean failIfUnknown) {
 		check();
-		//TODO detect first deleted record and insert new record there
+		int index;
+		if (logicalSize<size) {
+			// If table contains some deleted records, replace deleted record by new one.
+			index = deletedRecords.getIterator().next();
+			deletedRecords.remove(index);
+		} else {
+			// Add record at the end of the table
+			index = size;
+			size++;
+		}
 		while (record.hasNext()) {
 			T tag = record.next();
 			Bitmap bitmap = tagToBitmap.get(tag);
@@ -132,10 +141,10 @@ public class TagsTable<T> implements Cloneable {
 					tagToBitmap.put(tag, bitmap);
 				}
 			}
-			bitmap.add(size);
+			bitmap.add(index);
 		}
 		logicalSize++;
-		return size++;
+		return index;
 	}
 
 	private void check() {
@@ -153,12 +162,15 @@ public class TagsTable<T> implements Cloneable {
 		if (index>=size || index<0) {
 			throw new IllegalArgumentException();
 		}
-		//TODO Ruser dans le cas où on supprime le dernier index (size peut être diminué et deletedRecords n'est pas modifié.
-		deletedRecords.add(index);
 		for (Bitmap bitmap:tagToBitmap.values()) {
 			bitmap.remove(index);
 		}
 		logicalSize--;
+		if (index==size-1) {
+			size--;
+		} else {
+			deletedRecords.add(index);
+		}
 	}
 	
 	/** Gets the number of records contained in the table, including deleted records.
@@ -321,5 +333,19 @@ public class TagsTable<T> implements Cloneable {
 		if (bitmap!=null) {
 			bitmap.remove(id);
 		}
+	}
+	
+	@Override
+	public String toString() {
+		//TODO Limit the String size
+		StringBuilder builder = new StringBuilder();
+		builder.append(deletedRecords.toString());
+		for (T key:tagToBitmap.keySet()) {
+			builder.append('\n');
+			builder.append(key.toString());
+			builder.append(':');
+			builder.append(tagToBitmap.get(key).toString());
+		}
+		return builder.toString();
 	}
 }

@@ -127,4 +127,9 @@ public class BitSetBitmap implements Bitmap, Cloneable {
 			throw new IllegalStateException();
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return set.toString();
+	}
 }
