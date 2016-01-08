@@ -154,7 +154,7 @@ public class TagsTable<T> implements Cloneable {
 	}
 	
 	/** Deletes a record.
-	 * @param index The record index (returned by method {@link #addRecord(Iterator, boolean)} or by a iterator on a {@link RecordSet}
+	 * @param index The record index (returned by method {@link #addRecord(Iterator, boolean)} or by a iterator on a {@link Bitmap}
 	 * @throws IllegalArgumentException if index is negative or greater than or equals to size.
 	 */
 	public void deleteRecord(int index) {
@@ -191,12 +191,12 @@ public class TagsTable<T> implements Cloneable {
 
 	/** Gets the set of records that verify a logical expression.
 	 * @param logicalExpr a logical expression.
-	 * <br>Supported operators are ! (not), &amp;&amp; (and) and || (or).
+	 * <br>Supported operators depends on the {@link Evaluator} built by the {@link TagsTableFactory} used to create this table.
 	 * @param failIfUnknown true if the method should fail if a tag is unknown, false if unknown tags should be added automatically.
-	 * @return a record set
+	 * @return a bitmap. Each set index in the bitmap is the index of a record that satisfies the logical expression 
 	 * @throws UnknownTagException if the expression refers to an unknown tag and <i>failIfUnknown</i> is true. Otherwise unknown tags are considered false.
 	 */
-	public RecordSet evaluate(String logicalExpr, boolean failIfUnknown) {
+	public Bitmap evaluate(String logicalExpr, boolean failIfUnknown) {
 		Bitmap bitmap = evaluator.evaluate(logicalExpr, failIfUnknown);
 		if (logicalSize!=size) {
 			// If bitmap is not locked, but the table is, it means the bitmap was create by the evaluator itself
@@ -206,7 +206,7 @@ public class TagsTable<T> implements Cloneable {
 			}
 			bitmap.andNot(deletedRecords);
 		}
-		return new RecordSet(bitmap.getLocked(), this);
+		return bitmap.getLocked();
 	}
 	
 	/** Gets the set of records having a tag.
