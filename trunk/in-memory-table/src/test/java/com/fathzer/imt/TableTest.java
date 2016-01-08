@@ -33,48 +33,48 @@ public class TableTest {
 		assertEquals("E", tags.get(2));
 		
 		assertEquals(1, table.addRecord(new Record("B/D/F"), false));
-		RecordSet recordSet = table.evaluate("A && C", true);
-		assertEquals(1, recordSet.size());
-		IntIterator iterator = recordSet.getIds();
+		Bitmap recordSet = table.evaluate("A && C", true);
+		assertEquals(1, recordSet.getCardinality());
+		IntIterator iterator = recordSet.getIterator();
 		assertEquals(0, iterator.next());
 		
-		assertEquals(0, table.evaluate("A && B", true).size());
+		assertEquals(0, table.evaluate("A && B", true).getCardinality());
 		
 		recordSet = table.evaluate("A || D", true);
-		iterator = recordSet.getIds();
+		iterator = recordSet.getIterator();
 		assertEquals(0, iterator.next());
 		assertEquals(1, iterator.next());
-		assertEquals(2, recordSet.size());
+		assertEquals(2, recordSet.getCardinality());
 		
 		recordSet = table.evaluate("!E && A||D", true);
-		iterator = recordSet.getIds();
+		iterator = recordSet.getIterator();
 		assertEquals(1, iterator.next());
-		assertEquals(1, recordSet.size());
+		assertEquals(1, recordSet.getCardinality());
 		
 		recordSet = table.evaluate("!E", true);
-		assertEquals(1, recordSet.size());
-		iterator = recordSet.getIds();
+		assertEquals(1, recordSet.getCardinality());
+		iterator = recordSet.getIterator();
 		assertEquals(1, iterator.next());
 		
 		// Test unknown variables are false
 		recordSet = table.evaluate("Z", false);
-		assertEquals(0, recordSet.size());
+		assertEquals(0, recordSet.getCardinality());
 		
 		// Test remove/add
 		table.remove(0, "A");
 		assertEquals(2, table.getSize());
 		assertEquals(2, table.getLogicalSize());
-		assertEquals(0, table.evaluate("A", true).size());
+		assertEquals(0, table.evaluate("A", true).getCardinality());
 		assertFalse(table.contains(0, "A"));
 		table.add(0, "A", false);
 		assertEquals(2, table.getLogicalSize());
-		assertEquals(1, table.evaluate("A", true).size());
+		assertEquals(1, table.evaluate("A", true).getCardinality());
 		assertTrue(table.contains(0, "A"));
 		
 		// Test delete
 		table.deleteRecord(0);
 		assertEquals(1, table.getLogicalSize());
-		assertEquals(0, table.evaluate("C", true).size());
+		assertEquals(0, table.evaluate("C", true).getCardinality());
 		
 		// Test add again and lock, unlock
 		table = table.getLocked();
@@ -83,7 +83,7 @@ public class TableTest {
 		assertFalse(table.isLocked());
 		table.addRecord(new Record("A/C/E"), false);
 		assertEquals(2, table.getLogicalSize());
-		assertEquals(1, table.evaluate("C", true).size());
+		assertEquals(1, table.evaluate("C", true).getCardinality());
 		
 		// Test add unknown
 		table.add(0, "ZZ", false);
