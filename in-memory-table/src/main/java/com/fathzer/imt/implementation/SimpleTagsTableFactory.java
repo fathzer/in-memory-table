@@ -6,7 +6,6 @@ import java.util.Iterator;
 import com.fathzer.imt.Bitmap;
 import com.fathzer.imt.BitmapMap;
 import com.fathzer.imt.Evaluator;
-import com.fathzer.imt.TagsTable;
 import com.fathzer.imt.TagsTableFactory;
 
 /** A simple abstract factory that uses a HashMap and {@link DefaultEvaluator}.
@@ -37,28 +36,21 @@ public abstract class SimpleTagsTableFactory implements TagsTableFactory<String>
 		}
 	};
 	
+	/** Constructor. */
 	protected SimpleTagsTableFactory() {
 	}
 
 	@Override
-	public Evaluator buildEvaluator(final TagsTable<String> table) {
-		return new Evaluator() {
-			private ThreadLocal<Evaluator> evaluator = new ThreadLocal<Evaluator>() {
-				@Override
-				protected Evaluator initialValue() {
-					return new DefaultEvaluator<String>(table){
-						@Override
-						protected String stringToTag(String string) {
-							return string;
-						}
-						
-					};
-				}
-			};
-			
+	public Evaluator<String> getEvaluator() {
+		return new ThreadSafeEvaluator<String>() {
 			@Override
-			public Bitmap evaluate(String expression, boolean failIfUnknown) {
-				return evaluator.get().evaluate(expression, (Boolean)failIfUnknown);
+			protected Evaluator<String> buildUnsafeEvaluator() {
+				return new DefaultEvaluator<String>() {
+					@Override
+					protected String stringToTag(String string) {
+						return string;
+					}
+				};
 			}
 		};
 	}

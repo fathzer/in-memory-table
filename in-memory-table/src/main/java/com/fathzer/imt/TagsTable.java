@@ -67,7 +67,6 @@ public class TagsTable<T> implements Cloneable {
 	private TagsTableFactory<T> factory;
 	private Bitmap deletedRecords;
 	private BitmapMap<T> tagToBitmap;
-	private Evaluator evaluator;
 	private boolean isLocked;
 	
 	/** Creates a new empty table.
@@ -76,7 +75,6 @@ public class TagsTable<T> implements Cloneable {
 	public TagsTable(final TagsTableFactory<T> factory) {
 		this.factory = factory;
 		this.deletedRecords = factory.create();
-		this.evaluator = factory.buildEvaluator(TagsTable.this);
 		this.tagToBitmap = factory.buildmap();
 		this.isLocked = false;
 		this.logicalSize = 0;
@@ -197,7 +195,7 @@ public class TagsTable<T> implements Cloneable {
 	 * @throws UnknownTagException if the expression refers to an unknown tag and <i>failIfUnknown</i> is true. Otherwise unknown tags are considered false.
 	 */
 	public Bitmap evaluate(String logicalExpr, boolean failIfUnknown) {
-		Bitmap bitmap = evaluator.evaluate(logicalExpr, failIfUnknown);
+		Bitmap bitmap = factory.getEvaluator().evaluate(this, logicalExpr, failIfUnknown);
 		if (logicalSize!=size) {
 			// If bitmap is not locked, but the table is, it means the bitmap was create by the evaluator itself
 			// So, it is not useful to clone it.
@@ -238,7 +236,6 @@ public class TagsTable<T> implements Cloneable {
 				result.tagToBitmap.put(key, freshBitmap);
 			}
 			result.deletedRecords = deletedRecords.clone();
-			result.evaluator = factory.buildEvaluator(result);
 			result.isLocked = false;
 			return result;
 		} catch (CloneNotSupportedException e) {

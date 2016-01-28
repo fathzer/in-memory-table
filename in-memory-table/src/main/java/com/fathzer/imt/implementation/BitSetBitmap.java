@@ -1,5 +1,6 @@
 package com.fathzer.imt.implementation;
 
+import java.io.Serializable;
 import java.util.BitSet;
 
 import com.fathzer.imt.Bitmap;
@@ -9,7 +10,9 @@ import com.fathzer.imt.util.UnexpectedCloneNotSupportedException;
 /** A Bitmap backed by the java.util.BitSet class. 
  * @author Jean-Marc Astesana
  */
-public class BitSetBitmap implements Bitmap, Cloneable {
+public class BitSetBitmap implements Bitmap, Cloneable, Serializable {
+	private static final long serialVersionUID = 1L;
+
 	private BitSet set;
 	private boolean isLocked;
 	

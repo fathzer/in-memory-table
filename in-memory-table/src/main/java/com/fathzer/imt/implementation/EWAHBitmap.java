@@ -1,5 +1,7 @@
 package com.fathzer.imt.implementation;
 
+import java.io.Serializable;
+
 import com.fathzer.imt.Bitmap;
 import com.fathzer.imt.util.IntIterator;
 import com.fathzer.imt.util.UnexpectedCloneNotSupportedException;
@@ -8,7 +10,9 @@ import com.googlecode.javaewah.EWAHCompressedBitmap;
 /** A Bitmap backed by the excellent <a href="https://github.com/lemire/javaewah">javaewah library from D. Lemire</a>. 
  * @author Jean-Marc Astesana
  */
-public class EWAHBitmap implements Bitmap, Cloneable {
+public class EWAHBitmap implements Bitmap, Cloneable, Serializable {
+	private static final long serialVersionUID = 1L;
+
 	private EWAHCompressedBitmap set;
 	private boolean isLocked;
 	
