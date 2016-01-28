@@ -19,11 +19,11 @@ public interface TagsTableFactory<T> {
 	 */
 	Bitmap or(Iterator<Bitmap> bitmaps);
 
-	/** Builds an evaluator.
-	 * @param table The table on which evalations will be made.
-	 * @return An new evaluator.
+	/** Gets the evaluator used to evaluate the logical expressions on a tagsTable.
+	 * <br><b>Warning</b>: The returned evaluator should be thread safe.
+	 * @return The evaluator.
 	 */
-	Evaluator buildEvaluator(TagsTable<T> table);
+	Evaluator<T> getEvaluator();
 
 	/** Builds the object the maps tags to bitmaps.
 	 * @return a new map.

@@ -1,5 +1,7 @@
 package com.fathzer.imt.implementation;
 
+import java.io.Serializable;
+
 import com.fathzer.imt.Bitmap;
 import com.fathzer.imt.util.IntIterator;
 import com.fathzer.imt.util.UnexpectedCloneNotSupportedException;
@@ -7,7 +9,9 @@ import com.fathzer.imt.util.UnexpectedCloneNotSupportedException;
 /** A Bitmap backed by the excellent <a href="https://github.com/lemire/RoaringBitmap">Roaring library from D. Lemire</a>. 
  * @author Jean-Marc Astesana
  */
-public class RoaringBitmap implements Bitmap, Cloneable {
+public class RoaringBitmap implements Bitmap, Cloneable, Serializable {
+	private static final long serialVersionUID = 1L;
+
 	private org.roaringbitmap.RoaringBitmap set;
 	private boolean isLocked;
 	

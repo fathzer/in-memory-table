@@ -12,29 +12,28 @@ import com.fathzer.soft.javaluator.Operator;
 import com.fathzer.soft.javaluator.Parameters;
 
 /** A default logical evaluator based on the <a href="javaluator.fathzer.com">javaluator library</a>
+ * <br><b>Warning</b>: This evaluator is not thread safe.
  * @author Jean-Marc Astesana
  * @param <T> The type of keys used in the tags table on which this evaluator works.
  */
-public abstract class AbstractLogicalEvaluator<T> extends AbstractEvaluator<Bitmap> implements Evaluator {
-	private final TagsTable<T> table;
-
+public abstract class AbstractLogicalEvaluator<T> extends AbstractEvaluator<Bitmap> implements Evaluator<T> {
 	/** Constructor.
 	 * @param params The evaluator parameters (see <a href="javaluator.fathzer.com/en/doc/javadoc/com/fathzer/soft/javaluator/Parameters.html">Parameter</a>)
-	 * @param table The table on which to evaluate expressions.
 	 */
-	protected AbstractLogicalEvaluator(Parameters params, TagsTable<T> table) {
+	protected AbstractLogicalEvaluator(Parameters params) {
 		super(params);
-		this.table = table;
 	}
 	
 	@Override
-	protected Bitmap toValue(String literal, Object evaluationContext) {
-		Bitmap result = this.table.getBitMapIndex(stringToTag(literal));
+	protected Bitmap toValue(String literal, Object context) {
+		@SuppressWarnings("unchecked")
+		Context ct = (Context) context;
+		Bitmap result = ct.table.getBitMapIndex(stringToTag(literal));
 		if (result==null) {
-			if ((boolean) evaluationContext) {
+			if (ct.failIfUnknown) {
 				throw new UnknownTagException(literal);
 			} else {
-				result = this.table.getFactory().create();
+				result = ct.table.getFactory().create();
 			}
 		}
 		return result;
@@ -62,7 +61,9 @@ public abstract class AbstractLogicalEvaluator<T> extends AbstractEvaluator<Bitm
 			v1 = new Container(v1);
 		}
 		if (getNegate().equals(operator)) {
-			v1.not(table.getSize());
+			@SuppressWarnings("unchecked")
+			Context ct = (Context)evaluationContext;
+			v1.not(ct.table.getSize());
 		} else if (getOr().equals(operator)) {
 			v1.or(v2);
 		} else if (getAnd().equals(operator)) {
@@ -73,9 +74,19 @@ public abstract class AbstractLogicalEvaluator<T> extends AbstractEvaluator<Bitm
 		return v1;
 	}
 	
+	private final class Context {
+		TagsTable<T> table;
+		boolean failIfUnknown;
+		Context(TagsTable<T> table, boolean failIfUnknown) {
+			super();
+			this.table = table;
+			this.failIfUnknown = failIfUnknown;
+		}
+	}
+	
 	@Override
-	public Bitmap evaluate(String expression, boolean failIfUnknown) {
-		Bitmap result = super.evaluate(expression, failIfUnknown);
+	public Bitmap evaluate(TagsTable<T> table, String expression, boolean failIfUnknown) {
+		Bitmap result = super.evaluate(expression, new Context(table, failIfUnknown));
 		if (result instanceof Container) {
 			result = ((Container) result).internal;
 		}
