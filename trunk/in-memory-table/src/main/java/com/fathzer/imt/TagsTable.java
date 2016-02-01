@@ -287,6 +287,13 @@ public class TagsTable<T> implements Cloneable {
 		return new TagsIterator(id);
 	}
 	
+	/** Gets the tags contained in this table.
+	 * @return an iterator on tags.
+	 */
+	public Iterator<T> getTags() {
+		return tagToBitmap.keySet().iterator();
+	}
+	
 	/** Tests whether a record contains a tag. 
 	 * @param id A record id.
 	 * @param tag A tag
