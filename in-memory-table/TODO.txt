@@ -1,2 +1,1 @@
 Add multithreaded tests
-Try to implement serialization without making interfaces serializable

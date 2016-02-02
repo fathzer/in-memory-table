@@ -16,12 +16,11 @@ public class EWAHBitmap implements Bitmap, Cloneable, Serializable {
 	private EWAHCompressedBitmap set;
 	private boolean isLocked;
 	
+	/** Constructor.
+	 * <br>Builds a new empty bitmap. 
+	 */
 	public EWAHBitmap() {
-		this(new EWAHCompressedBitmap());
-	}
-	
-	private EWAHBitmap(EWAHCompressedBitmap set) {
-		this.set = set;
+		this.set = new EWAHCompressedBitmap();
 		this.isLocked = false;
 	}
 
@@ -127,6 +126,9 @@ public class EWAHBitmap implements Bitmap, Cloneable, Serializable {
 		}
 	}
 	
+	/** Clones this bitmap.
+	 * @return A <b>unlocked</b> copy of this bitmap 
+	 */
 	@Override
 	public EWAHBitmap clone() {
 		try {

@@ -9,7 +9,7 @@ class BitSetIterator implements IntIterator {
 	private int next = -1;
 	private BitSet bitset;
 	
-	public BitSetIterator(BitSet bitset) {
+	BitSetIterator(BitSet bitset) {
 		this.bitset = bitset;
 		this.next = bitset.nextSetBit(0);
 	}

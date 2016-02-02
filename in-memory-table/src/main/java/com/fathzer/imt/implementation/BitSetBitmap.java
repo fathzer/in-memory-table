@@ -16,12 +16,11 @@ public class BitSetBitmap implements Bitmap, Cloneable, Serializable {
 	private BitSet set;
 	private boolean isLocked;
 	
+	/** Constructor.
+	 * <br>Builds a new empty bitmap. 
+	 */
 	public BitSetBitmap() {
-		this (new BitSet());
-	}
-
-	private BitSetBitmap(BitSet set) {
-		this.set = set;
+		this.set = new BitSet();
 		this.isLocked = false;
 	}
 
@@ -29,6 +28,7 @@ public class BitSetBitmap implements Bitmap, Cloneable, Serializable {
 	public int getCardinality() {
 		return set.cardinality();
 	}
+	
 	@Override
 	public void or(Bitmap bitmap) {
 		check();
@@ -93,8 +93,12 @@ public class BitSetBitmap implements Bitmap, Cloneable, Serializable {
 
 	@Override
 	public long getSizeInBytes() {
-		//FIXME 1 bit requires more than 0 bytes!
-		return set.length()/8;
+		int len = set.length();
+		int result = len/64+1;
+		if (len % 64 == 0) {
+			result--;
+		}
+		return 8*result;
 	}
 
 	@Override
@@ -109,6 +113,10 @@ public class BitSetBitmap implements Bitmap, Cloneable, Serializable {
 		}
 	}
 	
+	/** Clones this bitmap.
+	 * @return A <b>unlocked</b> copy of this bitmap 
+	 */
+	@Override
 	public BitSetBitmap clone() {
 		try {
 			BitSetBitmap result = (BitSetBitmap) super.clone();

@@ -4,6 +4,9 @@ import com.fathzer.imt.Bitmap;
 import com.fathzer.imt.Evaluator;
 import com.fathzer.imt.TagsTable;
 
+/** A thread safe evaluator based on {@link ThreadLocal}.
+ * @param <T> The type of the tag class
+ */
 public abstract class ThreadSafeEvaluator<T> implements Evaluator<T> {
 	private ThreadLocal<Evaluator<T>> evaluator = new ThreadLocal<Evaluator<T>>() {
 		@Override
