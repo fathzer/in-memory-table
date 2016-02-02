@@ -1,5 +1,9 @@
 package com.fathzer.imt;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -14,17 +18,18 @@ import com.fathzer.imt.util.UnexpectedCloneNotSupportedException;
  * A request's result is a record set that can be accessed to get its cardinality and the tags of each of its records.
  * <br><br>
  * This class is not thread safe. Many threads can call {@link #evaluate(String, boolean)} concurrently, but not adding new tags or records.
- * <br>
+ * <br><br>
+ * This class can be serialized if the tags, the bitmaps and the factory are serializable.
  * @author JM Astesana
  * @param <T> The type of tags. This class should implements hashcode and equals in order to be used in a Map.
  */
-public class TagsTable<T> implements Cloneable {
+public class TagsTable<T> implements Cloneable, Externalizable {
 	private final class TagsIterator implements Iterator<T> {
 		private T next;
 		private Iterator<T> iter;
 		private int id;
 		
-		public TagsIterator(int id) {
+		TagsIterator(int id) {
 			this.id = id;
 			iter = tagToBitmap.keySet().iterator();
 			findNext();
@@ -341,15 +346,53 @@ public class TagsTable<T> implements Cloneable {
 	
 	@Override
 	public String toString() {
-		//TODO Limit the String size
 		StringBuilder builder = new StringBuilder();
 		builder.append(deletedRecords.toString());
 		for (T key:tagToBitmap.keySet()) {
 			builder.append('\n');
 			builder.append(key.toString());
 			builder.append(':');
-			builder.append(tagToBitmap.get(key).toString());
+			Bitmap bitmap = tagToBitmap.get(key);
+			if (bitmap.getCardinality()>1000) {
+				builder.append("...");
+			} else {
+				builder.append(bitmap.toString());
+			}
+			if (builder.length()>10000) {
+				break;
+			}
 		}
 		return builder.toString();
+	}
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeObject(factory);
+		out.writeInt(getSize());
+		out.writeInt(getLogicalSize());
+		out.writeInt(this.tagToBitmap.keySet().size());
+		Iterator<T> tags = this.getTags();
+		while (tags.hasNext()) {
+			T tag = tags.next();
+			out.writeObject(tag);
+			out.writeObject(getBitMapIndex(tag));
+		}
+		out.writeObject(deletedRecords);
+		out.writeBoolean(isLocked());
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+		this.factory = (TagsTableFactory<T>) in.readObject();
+		this.size = in.readInt();
+		this.logicalSize = in.readInt();
+		int nbTags = in.readInt();
+		this.tagToBitmap = factory.buildmap();
+		for (int i = 0; i < nbTags; i++) {
+			tagToBitmap.put((T)in.readObject(), (Bitmap)in.readObject());
+		}
+		this.deletedRecords = (Bitmap) in.readObject();
+		this.isLocked = in.readBoolean();
 	}
 }

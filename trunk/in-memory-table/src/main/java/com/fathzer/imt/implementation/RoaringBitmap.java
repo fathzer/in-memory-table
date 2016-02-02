@@ -15,6 +15,9 @@ public class RoaringBitmap implements Bitmap, Cloneable, Serializable {
 	private org.roaringbitmap.RoaringBitmap set;
 	private boolean isLocked;
 	
+	/** Constructor.
+	 * <br>Builds a new empty bitmap. 
+	 */
 	public RoaringBitmap() {
 		this.set = new org.roaringbitmap.RoaringBitmap();
 		this.isLocked = false;
@@ -116,6 +119,9 @@ public class RoaringBitmap implements Bitmap, Cloneable, Serializable {
 		}
 	}
 	
+	/** Clones this bitmap.
+	 * @return A <b>unlocked</b> copy of this bitmap 
+	 */
 	@Override
 	public RoaringBitmap clone() {
 		RoaringBitmap result;

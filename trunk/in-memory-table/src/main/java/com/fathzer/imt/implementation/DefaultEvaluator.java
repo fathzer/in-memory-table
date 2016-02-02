@@ -27,6 +27,8 @@ public abstract class DefaultEvaluator<T> extends AbstractLogicalEvaluator<T> {
     PARAMETERS.addExpressionBracket(BracketPair.PARENTHESES);
 	}
 
+	/** Constructor.
+	 */
 	public DefaultEvaluator() {
 		super(PARAMETERS);
 	}
