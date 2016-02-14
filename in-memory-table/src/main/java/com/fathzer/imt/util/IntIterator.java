@@ -5,6 +5,20 @@ import java.util.NoSuchElementException;
 /** An iterator on int.
  */
 public interface IntIterator {
+	/** An empty iterator on int. 
+	 */
+	public final static IntIterator EMPTY = new IntIterator() {
+		@Override
+		public boolean hasNext() {
+			return false;
+		}
+
+		@Override
+		public int next() {
+			throw new NoSuchElementException();
+		}
+	};
+
 	/** Tests whether the iterator has next element.
 	 * @return true if elements remain.
 	 */

@@ -177,5 +177,9 @@ public abstract class AbstractLogicalEvaluator<T> extends AbstractEvaluator<Bitm
 		public Bitmap clone() {
 			throw new UnsupportedOperationException();
 		}
+		@Override
+		public String toString() {
+			return internal.toString();
+		}
 	}
 }

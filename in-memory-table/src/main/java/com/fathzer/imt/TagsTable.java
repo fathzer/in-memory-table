@@ -395,4 +395,11 @@ public class TagsTable<T> implements Cloneable, Externalizable {
 		this.deletedRecords = (Bitmap) in.readObject();
 		this.isLocked = in.readBoolean();
 	}
+
+	/** Gets the number of tags in this table.
+	 * @return an int
+	 */
+	public int getTagsNumber() {
+		return tagToBitmap.values().size();
+	}
 }
