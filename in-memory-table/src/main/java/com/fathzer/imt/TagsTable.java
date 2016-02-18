@@ -200,14 +200,24 @@ public class TagsTable<T> implements Cloneable, Externalizable {
 	 * @throws UnknownTagException if the expression refers to an unknown tag and <i>failIfUnknown</i> is true. Otherwise unknown tags are considered false.
 	 */
 	public Bitmap evaluate(String logicalExpr, boolean failIfUnknown) {
-		Bitmap bitmap = factory.getEvaluator().evaluate(this, logicalExpr, failIfUnknown);
-		if (logicalSize!=size) {
-			// If bitmap is not locked, but the table is, it means the bitmap was create by the evaluator itself
-			// So, it is not useful to clone it.
-			if (bitmap.isLocked() || !isLocked()) {
-				bitmap = bitmap.clone();
+		logicalExpr = logicalExpr.trim();
+		Bitmap bitmap;
+		if (logicalExpr.isEmpty()) {
+			bitmap = factory.create();
+			bitmap.not(size);
+			if (logicalSize!=size) {
+				bitmap.andNot(deletedRecords);
 			}
-			bitmap.andNot(deletedRecords);
+		} else {
+			bitmap = factory.getEvaluator().evaluate(this, logicalExpr, failIfUnknown);
+			if (logicalSize!=size) {
+				// If bitmap is not locked, but the table is, it means the bitmap was create by the evaluator itself
+				// So, it is not useful to clone it.
+				if (bitmap.isLocked() || !isLocked()) {
+					bitmap = bitmap.clone();
+				}
+				bitmap.andNot(deletedRecords);
+			}
 		}
 		return bitmap.getLocked();
 	}
