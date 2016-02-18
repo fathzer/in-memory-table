@@ -17,12 +17,13 @@ public class TableTest {
 
 	@Test
 	public void test() {
-		doTest (new TagsTable<String>(SimpleTagsTableFactory.BITSET_FACTORY));
-		doTest (new TagsTable<String>(SimpleTagsTableFactory.ROARING_FACTORY));
-		doTest (new TagsTable<String>(SimpleTagsTableFactory.EWAH_FACTORY));
+		doTest (SimpleTagsTableFactory.BITSET_FACTORY);
+		doTest (SimpleTagsTableFactory.ROARING_FACTORY);
+		doTest (SimpleTagsTableFactory.EWAH_FACTORY);
 	}
 
-	private void doTest(TagsTable<String> table) {
+	private void doTest(SimpleTagsTableFactory bitsetFactory) {
+		TagsTable<String> table = new TagsTable<>(bitsetFactory);
 		int index = table.addRecord(new Record("A/C/E"), false);
 		assertEquals(0, index);
 		List<String> tags = IteratorUtils.toList(table.getTags(index));
@@ -88,6 +89,17 @@ public class TableTest {
 		// Test add unknown
 		table.add(0, "ZZ", false);
 		assertTrue(table.contains(0, "ZZ"));
+	}
+	
+	@Test
+	public void emptyExpressionTest() {
+		TagsTable<String> table = new TagsTable<>(SimpleTagsTableFactory.BITSET_FACTORY);
+		int index = table.addRecord(new Record("A/C/E"), false);
+		table.addRecord(new Record("B/D/F"), false);
+		table.deleteRecord(index);
+
+		// Test empty logical expression
+		assertEquals(table.getLogicalSize(), table.evaluate("", false).getCardinality());
 	}
 	
 	@Test(expected = IllegalStateException.class)

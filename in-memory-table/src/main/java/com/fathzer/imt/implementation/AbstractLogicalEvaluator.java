@@ -86,9 +86,15 @@ public abstract class AbstractLogicalEvaluator<T> extends AbstractEvaluator<Bitm
 	
 	@Override
 	public Bitmap evaluate(TagsTable<T> table, String expression, boolean failIfUnknown) {
-		Bitmap result = super.evaluate(expression, new Context(table, failIfUnknown));
-		if (result instanceof Container) {
-			result = ((Container) result).internal;
+		Bitmap result;
+		if (expression.isEmpty()) {
+			result = table.getFactory().create();
+			result.not(table.getSize());
+		} else {
+			result = super.evaluate(expression, new Context(table, failIfUnknown));
+			if (result instanceof Container) {
+				result = ((Container) result).internal;
+			}
 		}
 		return result;
 	}

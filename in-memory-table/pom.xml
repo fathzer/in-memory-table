@@ -7,7 +7,7 @@
 		<version>1.0.2</version>
 	</parent>
 	<artifactId>in-memory-table</artifactId>
-	<version>0.0.2</version>
+	<version>0.0.3</version>
 	<scm>
 		<url>http://svn.code.sf.net/p/in-memory-table/code/trunk/in-memory-table</url>
 		<connection>http://svn.code.sf.net/p/in-memory-table/code/trunk/in-memory-table</connection>
