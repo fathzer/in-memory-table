@@ -7,7 +7,7 @@ import java.util.NoSuchElementException;
 public interface IntIterator {
 	/** An empty iterator on int. 
 	 */
-	public final static IntIterator EMPTY = new IntIterator() {
+	public static final IntIterator EMPTY = new IntIterator() {
 		@Override
 		public boolean hasNext() {
 			return false;
