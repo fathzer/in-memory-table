@@ -1,9 +1,9 @@
 package com.fathzer.imt;
 
-import java.io.Externalizable;
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -23,7 +23,9 @@ import com.fathzer.imt.util.UnexpectedCloneNotSupportedException;
  * @author JM Astesana
  * @param <T> The type of tags. This class should implements hashcode and equals in order to be used in a Map.
  */
-public class TagsTable<T> implements Cloneable, Externalizable {
+public class TagsTable<T> implements Cloneable, Serializable {
+	private static final long serialVersionUID = 1L;
+
 	private final class TagsIterator implements Iterator<T> {
 		private T next;
 		private Iterator<T> iter;
@@ -375,8 +377,7 @@ public class TagsTable<T> implements Cloneable, Externalizable {
 		return builder.toString();
 	}
 
-	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {
+	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeObject(factory);
 		out.writeInt(getSize());
 		out.writeInt(getLogicalSize());
@@ -392,8 +393,7 @@ public class TagsTable<T> implements Cloneable, Externalizable {
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
-	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
 		this.factory = (TagsTableFactory<T>) in.readObject();
 		this.size = in.readInt();
 		this.logicalSize = in.readInt();
