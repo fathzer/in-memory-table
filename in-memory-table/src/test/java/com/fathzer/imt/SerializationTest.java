@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -16,7 +15,7 @@ import com.fathzer.imt.implementation.SimpleTagsTableFactory;
 public class SerializationTest {
 	@Test
 	public void test() throws IOException, ClassNotFoundException {
-		TagsTable<String> table = new MyTable();
+		TagsTable<String> table = new TagsTable<>(SimpleTagsTableFactory.BITSET_FACTORY);
 		table.addRecord(new Record("A/C"), false);
 		table.addRecord(new Record("B/D"), false);
 		table.deleteRecord(0);
@@ -60,11 +59,5 @@ public class SerializationTest {
 			out.close();
 		}
 		return bo.toByteArray();
-	}
-
-	public static class MyTable extends TagsTable<String> implements Externalizable {
-		public MyTable() {
-			super(SimpleTagsTableFactory.BITSET_FACTORY);
-		}
 	}
 }

@@ -1,5 +1,9 @@
 package com.fathzer.imt;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -99,6 +103,27 @@ public class TableTest {
 		table.deleteRecord(index);
 
 		// Test empty logical expression
+		assertEquals(table.getLogicalSize(), table.evaluate("", false).getCardinality());
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testSerialization() throws Exception {
+		TagsTable<String> table = new TagsTable<>(SimpleTagsTableFactory.BITSET_FACTORY);
+		int index = table.addRecord(new Record("A/C/E"), false);
+		table.addRecord(new Record("B/D/F"), false);
+		table.deleteRecord(index);
+
+		// Test empty logical expression
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try (ObjectOutputStream oo = new ObjectOutputStream(out)) {
+			oo.writeObject(table);
+		}
+		byte[] bytes = out.toByteArray();
+		System.out.println ("Just for fun: size="+bytes.length+"bytes");
+		try (ObjectInputStream oo = new ObjectInputStream(new ByteArrayInputStream(bytes))) {
+			table = (TagsTable<String>) oo.readObject();
+		}
 		assertEquals(table.getLogicalSize(), table.evaluate("", false).getCardinality());
 	}
 	
