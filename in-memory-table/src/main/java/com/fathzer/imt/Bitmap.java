@@ -64,6 +64,12 @@ public interface Bitmap extends Cloneable {
 	 */
 	boolean contains (int index);
 	
+	/** Tests whether this bitmap intersects another one.
+	 * @param bitmap a Bitmap
+	 * @return true if the bitmaps intersects (their and is not empty).
+	 */
+	boolean intersects(Bitmap bitmap);
+	
 	/** Sets a bit in this bitmap to 1.
 	 * @param index The index of the bit to set
 	 * @throws IllegalStateException if this bitmap is locked

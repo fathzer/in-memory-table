@@ -233,6 +233,14 @@ public class TagsTable<T> implements Cloneable, Serializable {
 		return this.tagToBitmap.get(tag);
 	}
 	
+	/** Gets the the deleted records.
+	 * @return a record set where each bit set identifies a deleted record.
+	 * <br><b>Warning:</b> There are side effects between the returned instance and the table.
+	 */
+	public Bitmap getDeletedRecords() {
+		return this.deletedRecords;
+	}
+
 	/** Clones the table.
 	 * This method performs a deep clone and guarantees no side effect between this and the returned table.
 	 * @return a new Table that contains a modifiable copy of this.

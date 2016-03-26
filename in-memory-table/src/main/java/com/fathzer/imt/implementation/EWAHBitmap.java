@@ -61,6 +61,11 @@ public class EWAHBitmap implements Bitmap, Cloneable, Serializable {
 	}
 
 	@Override
+	public boolean intersects(Bitmap bitmap) {
+		return set.intersects(((EWAHBitmap)bitmap).set);
+	}
+
+	@Override
 	public void trim() {
 		check();
 		set.trim();
