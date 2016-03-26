@@ -138,6 +138,10 @@ public abstract class AbstractLogicalEvaluator<T> extends AbstractEvaluator<Bitm
 			internal.not(size);
 		}
 		@Override
+		public boolean intersects(Bitmap bitmap) {
+			return internal.intersects(bitmap);
+		}
+		@Override
 		public void trim() {
 			internal.trim();
 		}

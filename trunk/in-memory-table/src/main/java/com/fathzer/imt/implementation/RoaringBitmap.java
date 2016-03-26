@@ -59,6 +59,11 @@ public class RoaringBitmap implements Bitmap, Cloneable, Serializable {
 	}
 
 	@Override
+	public boolean intersects(Bitmap bitmap) {
+		return org.roaringbitmap.RoaringBitmap.intersects(set, ((RoaringBitmap)bitmap).set);
+	}
+
+	@Override
 	public void trim() {
 		check();
 		set.trim();

@@ -60,6 +60,11 @@ public class BitSetBitmap implements Bitmap, Cloneable, Serializable {
 	}
 
 	@Override
+	public boolean intersects(Bitmap bitmap) {
+		return set.intersects(((BitSetBitmap)bitmap).set);
+	}
+
+	@Override
 	public void trim() {
 		// Nothing to do
 	}
