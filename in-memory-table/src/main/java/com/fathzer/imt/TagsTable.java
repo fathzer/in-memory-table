@@ -197,7 +197,7 @@ public class TagsTable<T> implements Cloneable, Serializable {
 	/** Gets the set of records that verify a logical expression.
 	 * @param logicalExpr a logical expression.
 	 * <br>Supported operators depends on the {@link Evaluator} built by the {@link TagsTableFactory} used to create this table.
-	 * @param failIfUnknown true if the method should fail if a tag is unknown, false if unknown tags should be added automatically.
+	 * @param failIfUnknown true if the method should fail if a tag is unknown, false if unknown tags should be assumed as included in no record.
 	 * @return a bitmap. Each set index in the bitmap is the index of a record that satisfies the logical expression 
 	 * @throws UnknownTagException if the expression refers to an unknown tag and <i>failIfUnknown</i> is true. Otherwise unknown tags are considered false.
 	 */
