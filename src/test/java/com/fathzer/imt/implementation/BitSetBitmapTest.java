@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import com.fathzer.imt.AbstractBitmapTest;
 import com.fathzer.imt.TagsTableFactory;
-import com.fathzer.imt.implementation.SimpleTagsTableFactory;
 
 public class BitSetBitmapTest extends AbstractBitmapTest {
 	@Override

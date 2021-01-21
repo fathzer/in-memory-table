@@ -93,7 +93,7 @@ public class TagsTable<T> implements Cloneable, Serializable {
 	 * @param tags the tags to add to the table
 	 * @param tagRecords Each element of this list contains the existing record indexes where tag should be added, or null to not attached created tags to any records.
 	 * @throws DuplicatedTagException if a tag is already declared in the table
-	 * @throws IllegalArgumentException if a tagRecords is not null and has not same size as tags.
+	 * @throws IllegalArgumentException if tagRecords is not null and has not same size as tags.
 	 * @throws IllegalStateException if this is locked
 	 */
 	public void addTags(List<T> tags, List<IntIterator> tagRecords) {

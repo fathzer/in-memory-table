@@ -13,7 +13,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-import com.fathzer.imt.TagsTable;
 import com.fathzer.imt.implementation.SimpleTagsTableFactory;
 import com.fathzer.imt.util.IntIterator;
 
@@ -61,6 +60,12 @@ public class TableTest {
 		iterator = recordSet.getIterator();
 		assertEquals(1, iterator.next());
 		
+		// Test constants
+		final String TRUE = "ALWAYS_TRUE";
+		final String FALSE = "ALWAYS_FALSE"; 
+		assertEquals(0, table.evaluate(FALSE, true).getCardinality());
+		assertEquals(2, table.evaluate(TRUE, true).getCardinality());
+		
 		// Test unknown variables are false
 		recordSet = table.evaluate("Z", false);
 		assertEquals(0, recordSet.getCardinality());
@@ -80,6 +85,7 @@ public class TableTest {
 		table.deleteRecord(0);
 		assertEquals(1, table.getLogicalSize());
 		assertEquals(0, table.evaluate("C", true).getCardinality());
+		assertEquals(1, table.evaluate(TRUE, true).getCardinality());
 		
 		// Test add again and lock, unlock
 		table = table.getLocked();

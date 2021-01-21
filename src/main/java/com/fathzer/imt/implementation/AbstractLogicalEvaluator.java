@@ -8,6 +8,7 @@ import com.fathzer.imt.TagsTable;
 import com.fathzer.imt.UnknownTagException;
 import com.fathzer.imt.util.IntIterator;
 import com.fathzer.soft.javaluator.AbstractEvaluator;
+import com.fathzer.soft.javaluator.Constant;
 import com.fathzer.soft.javaluator.Operator;
 import com.fathzer.soft.javaluator.Parameters;
 
@@ -39,6 +40,17 @@ public abstract class AbstractLogicalEvaluator<T> extends AbstractEvaluator<Bitm
 		return result;
 	}
 	
+	@Override
+	protected Bitmap evaluate(Constant constant, Object context) {
+		@SuppressWarnings("unchecked")
+		Context ct = (Context) context;
+		final Bitmap result = ct.table.getFactory().create();
+		if (getAlwaysTrue().equals(constant)) {
+			result.not(ct.table.getSize());
+		}
+		return result;
+	}
+
 	/** Converts a variable name found in a logical expression to a tag.
 	 * @param variable The variable name
 	 * @return the tag corresponding to that variable.
@@ -108,6 +120,12 @@ public abstract class AbstractLogicalEvaluator<T> extends AbstractEvaluator<Bitm
 	 */
 	protected abstract Operator getOr();
 	
+	/** Gets the always true constant*/
+	protected abstract Constant getAlwaysTrue();
+	
+	/** Gets the always true constant*/
+	protected abstract Constant getAlwaysFalse();
+
 	private static class Container implements Bitmap {
 		Bitmap internal;
 		Container(Bitmap bitmap) {
